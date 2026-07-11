@@ -1,4 +1,4 @@
-from typing import Any, Generator
+from typing import Any, Generator, Self
 
 from color import Color, enum_to_color
 import pygame as pg
@@ -43,6 +43,21 @@ class ColorGrid:
         for y in range(self.h):
             for x in range(self.w):
                 yield (x, y), self[x, y]
+
+    def copy(self) -> Self:
+        output: ColorGrid = ColorGrid(
+            self.w,
+            self.h,
+            self.bounding_rect,
+            self.default_color,
+            self.draw_grid_line,
+            self.grid_color
+        )
+
+        for (x, y), color in self.get_items():
+            output[x, y] = color
+        
+        return output#type: ignore
 
     def get_rect(self, pos: tuple[int, int]) -> pg.Rect:
         x, y = pos

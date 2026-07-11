@@ -1,4 +1,5 @@
 import asyncio
+import enum
 from random import choice
 
 from color import Color, enum_to_color
@@ -8,6 +9,12 @@ from grid import ColorGrid
 from rule import DRSpread, Rule
 from scenes import Scene
 
+
+class Mode(enum.Enum):
+    FROZEN = enum.auto()
+    NORMAL = enum.auto()
+    SPEDUP = enum.auto()
+    NOSTEP = enum.auto()
 
 async def game() -> Scene:
     game_data: GameData = GameData()
@@ -33,6 +40,8 @@ async def game() -> Scene:
         ),
         draw_grid_line=True
     )
+    
+    simulation_grid: ColorGrid = input_grid.copy()
 
     solution_grid: ColorGrid = ColorGrid(
         8,
@@ -120,10 +129,16 @@ async def game() -> Scene:
         color_option_rects.append(current_option_rect.copy())
         current_option_rect.right = current_option_rect.left - DIST_BTW_COLOR_OPTIONS
 
-    is_inputing: bool = True
+    TIME_BTW_STEPS_MS: int = 500
+    TIME_BTW_STEPS_MS_FAST_MODE: int = 200
+    
+    time_since_last_step_ms = 0
+
+    current_mode: Mode = Mode.NOSTEP
 
     while True:
         dt = clock.tick(max_fps)
+        time_since_last_step_ms+= dt
         screen.fill(bg_color)
 
         for event in pg.event.get():
@@ -131,12 +146,55 @@ async def game() -> Scene:
                 return Scene.QUIT
             
             if event.type == pg.KEYDOWN:
+                if event.key == pg.K_r:
+                    time_since_last_step_ms = 0
+                    current_mode = Mode.NOSTEP
+
                 if event.key == pg.K_n:
+                    if current_mode != Mode.FROZEN:
+                        continue
+                    time_since_last_step_ms = 0
                     for rule in rules:
-                        rule.step(input_grid)
+                        rule.step(simulation_grid)
+
+                if event.key == pg.K_k:
+                    time_since_last_step_ms = 0
+                    if current_mode == Mode.NOSTEP:
+                        should_change: bool = True
+                        simulation_grid = input_grid.copy()
+                        for rule in rules:
+                            for option in rule.options:
+                                if option is None:
+                                    should_change = False
+                                    break
+                            
+                            if not should_change:
+                                break
+
+                        if not should_change:
+                            continue
+
+                        current_mode = Mode.NORMAL
+                        continue
+
+                    if current_mode == Mode.FROZEN:
+                        current_mode = Mode.NORMAL
+                        continue
+
+                    current_mode = Mode.FROZEN
+                    continue
+                
+                if event.key == pg.K_l:
+                    if current_mode == Mode.NORMAL:
+                        current_mode = Mode.SPEDUP
+                    elif current_mode == Mode.SPEDUP:
+                        current_mode = Mode.NORMAL
                 continue
 
             if event.type == pg.MOUSEBUTTONDOWN:
+                if current_mode != Mode.NOSTEP:
+                    continue
+
                 if event.button != 1:
                     continue
 
@@ -200,11 +258,30 @@ async def game() -> Scene:
                     color_no_left[selected_color_i] -= 1
                     input_grid[x, y] = color_options[selected_color_i]
 
-        input_grid.draw(screen)
+        if current_mode == Mode.NOSTEP:
+            input_grid.draw(screen)
+        else:
+            simulation_grid.draw(screen)
         solution_grid.draw(screen)
 
+        should_step: bool = False
+        if current_mode == Mode.NORMAL:
+            should_step = time_since_last_step_ms >= TIME_BTW_STEPS_MS
+        elif current_mode == Mode.SPEDUP:
+            should_step = time_since_last_step_ms >= TIME_BTW_STEPS_MS_FAST_MODE
+        
+        if should_step:
+            time_since_last_step_ms = 0
+
         for rule in rules:
+            if should_step:
+                rule.step(simulation_grid)
             rule.draw(screen)
+
+            if current_mode != Mode.NOSTEP:
+                pixel: pg.Surface = pg.Surface(rule.bg_rect.size, flags=pg.SRCALPHA)
+                pixel.fill(game_data.grey_out_color)
+                screen.blit(pixel, rule.bg_rect, special_flags=pg.BLEND_RGB_MULT)
 
         for i, (color_value, no_left, option_rect) in enumerate(zip(color_options, color_no_left, color_option_rects)):
             color: pg.Color = enum_to_color[color_value]
@@ -244,6 +321,11 @@ async def game() -> Scene:
 
             screen.blit(outline_sprite, outline_rect)
             screen.blit(sprite, sprite_rect)
+
+            if current_mode != Mode.NOSTEP:
+                pixel: pg.Surface = pg.Surface(option_rect.size, flags=pg.SRCALPHA)
+                pixel.fill(game_data.grey_out_color)
+                screen.blit(pixel, option_rect, special_flags=pg.BLEND_RGB_MULT)
 
         await asyncio.sleep(0)
         pg.display.update()
