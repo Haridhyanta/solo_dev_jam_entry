@@ -1,18 +1,25 @@
 from typing import Any, Callable, Coroutine
 import asyncio
 
+import pygame as pg
+from game import game
+from scenes import Scene
 from game_data import GameData
 from scenes import Scene
 
-
-scenes_to_func: dict[Scene, Callable[[], Coroutine[Any, Any, Scene]]] = {}
+scenes_to_func: dict[Scene, Callable[[], Coroutine[Any, Any, Scene]]] = {
+    Scene.GAME: game,
+}
 
 async def main():
     GameData()
-    current_scene: Scene = Scene.QUIT
+    current_scene: Scene = Scene.GAME
 
     while current_scene != Scene.QUIT:
-        current_scene = asyncio.run(scenes_to_func[current_scene]())
+        current_scene = await scenes_to_func[current_scene]()
+        await asyncio.sleep(0)
+
+    pg.quit()
     
 if __name__ == '__main__':
     asyncio.run(main())
