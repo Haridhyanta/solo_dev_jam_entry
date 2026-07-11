@@ -1,3 +1,5 @@
+import pathlib
+
 import pygame as pg
 
 class Singleton(type):
@@ -20,3 +22,11 @@ class GameData(metaclass=Singleton):
         self.max_fps: float = 0
 
         self.bg_color: tuple[int, int, int] = 0, 0, 0
+
+        self.normal_font_path = r'./Roboto/static/Roboto-Medium.ttf'
+        self.normal_font = pg.font.Font(self.normal_font_path, 32)
+        self.small_font = pg.font.Font(self.normal_font_path, 16)
+        self.bold_font_path = r'./Roboto/static/Roboto-Bold.ttf'
+        self.bold_font = pg.font.Font(self.bold_font_path, 32)
+
+        self.text_color: tuple[int, int, int] = 0, 0, 0

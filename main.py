@@ -11,8 +11,9 @@ scenes_to_func: dict[Scene, Callable[[], Coroutine[Any, Any, Scene]]] = {
     Scene.GAME: game,
 }
 
+GameData()
+
 async def main():
-    GameData()
     current_scene: Scene = Scene.GAME
 
     while current_scene != Scene.QUIT:

@@ -34,6 +34,9 @@ class ColorGrid:
     def __setitem__(self, key: tuple[int, int], value: Color):
         self.grid[key[1]][key[0]] = value
 
+    def __contains__(self, item: tuple[int, int]):
+        return (item[0] < self.w) and (item[1] < self.h)
+
     def get_items(self) -> Generator[tuple[tuple[int, int], Color], Any, Any]:
         for y in range(self.h):
             for x in range(self.w):
