@@ -22,6 +22,8 @@ class ColorGrid:
 
         self.bounding_rect = bounding_rect
 
+        self.default_color: Color = default_color
+
         self.grid: list[list[Color]] = [[default_color for _ in range(w)] for __ in range(h)]
 
         self.draw_grid_line = draw_grid_line
@@ -42,6 +44,12 @@ class ColorGrid:
             for x in range(self.w):
                 yield (x, y), self[x, y]
 
+    def get_rect(self, pos: tuple[int, int]) -> pg.Rect:
+        x, y = pos
+        topleft = x*self.cell_w + self.bounding_rect.x, y*self.cell_h + self.bounding_rect.y
+        rect: pg.Rect = pg.Rect(topleft, (self.cell_w, self.cell_h))
+        return rect
+
     def draw(self, screen: pg.surface.Surface) -> None:
         # pg.draw.rect(
         #     screen,
@@ -52,8 +60,7 @@ class ColorGrid:
         # )
 
         for (x, y), color in self.get_items():
-            topleft = x*self.cell_w + self.bounding_rect.x, y*self.cell_h + self.bounding_rect.y
-            rect: pg.Rect = pg.Rect(topleft, (self.cell_w, self.cell_h))
+            rect: pg.Rect = self.get_rect((x, y))
             pg_color = enum_to_color[color]
             pg.draw.rect(
                 screen,

@@ -1,7 +1,7 @@
 import asyncio
 from random import choice
 
-from color import Color
+from color import Color, enum_to_color
 from game_data import GameData
 import pygame as pg
 from grid import ColorGrid
@@ -59,7 +59,7 @@ async def game() -> Scene:
         )
 
     DIST_BTW_RULES_AND_EDGE: int = WIND_X//17
-    DIST_BTW_RULES: int = WIND_X//20
+    DIST_BTW_RULES: int = WIND_Y//30
 
     current_rule_rect: pg.Rect = pg.Rect(
         0, 
@@ -95,6 +95,33 @@ async def game() -> Scene:
         ),
     ]
     
+    color_options: list[Color] = [Color.RED, Color.GREEN]
+    color_no_left: list[int] = [1, 1]
+    color_option_rects: list[pg.Rect] = []
+    selected_color_i: int = -1
+
+    COLOR_OPTION_FONT: pg.font.Font = game_data.large_font
+    COLOR_OPTION_OUTLINE_W: int = 5
+
+    COLOR_OPTION_BORDER_DEFAULT_COLOR: pg.Color = pg.Color((250, 95, 28))
+    COLOR_OPTION_BORDER_SELECTED_COLOR: pg.Color = pg.Color("White")
+    COLOR_OPTION_BORDER_W: int = 5
+    COLOR_OPTION_BORDER_R: int = 2
+
+    COLOR_OPTION_SIZE: tuple[int, int] = WIND_Y//10, WIND_Y//10
+    DIST_BTW_COLOR_OPTION_AND_EDGE: int = DIST_BTW_RULES_AND_EDGE
+    DIST_BTW_COLOR_OPTIONS: int = DIST_BTW_RULES
+    DIST_BTW_COLOR_OPTION_AND_RULES: int = WIND_Y//15
+
+    current_option_rect: pg.Rect = pg.Rect((0, 0), COLOR_OPTION_SIZE)
+    current_option_rect.right = WIND_X - DIST_BTW_COLOR_OPTION_AND_EDGE
+    current_option_rect.bottom = current_rule_rect.top - DIST_BTW_COLOR_OPTION_AND_RULES
+    for _ in color_options:
+        color_option_rects.append(current_option_rect.copy())
+        current_option_rect.right = current_option_rect.left - DIST_BTW_COLOR_OPTIONS
+
+    is_inputing: bool = True
+
     while True:
         dt = clock.tick(max_fps)
         screen.fill(bg_color)
@@ -107,12 +134,114 @@ async def game() -> Scene:
                 if event.key == pg.K_n:
                     for rule in rules:
                         rule.step(input_grid)
+                continue
+
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if event.button != 1:
+                    continue
+
+                mouse_pos: tuple[int, int] = event.pos
+                matched: bool = False
+                for i, option_rect in enumerate(color_option_rects):
+                    if not option_rect.collidepoint(mouse_pos):
+                        continue
+
+                    matched = True
+                    if i==selected_color_i:
+                        selected_color_i = -1
+                        continue
+
+                    selected_color_i = i
+                    break
+
+                if matched:
+                    continue
+
+                if selected_color_i < 0:
+                    continue
+
+                for rule in rules:
+                    for i, color_input_rect in enumerate(rule.option_rects):
+                        if not color_input_rect.collidepoint(mouse_pos):
+                            continue
+
+                        matched = True
+
+                        rule.options[i] = color_options[selected_color_i]
+                        break
+
+                    if matched:
+                        break
+
+                if matched:
+                    continue
+
+                for (x, y), color_value in input_grid.get_items():
+                    rect: pg.Rect = input_grid.get_rect((x, y))
+                    if not rect.collidepoint(mouse_pos):
+                        continue
+
+                    matched = True
+                    for i, color_option in enumerate(color_options):
+                        if color_value == color_option:
+                            color_no_left[i] += 1
+                            break
+
+                    new_color_value: Color = color_options[selected_color_i]
+                    if color_value == new_color_value:
+                        input_grid[x, y] = input_grid.default_color
+                        break
+                        
+                    if color_no_left[selected_color_i] <= 0:
+                        break
+
+                    color_no_left[selected_color_i] -= 1
+                    input_grid[x, y] = color_options[selected_color_i]
 
         input_grid.draw(screen)
         solution_grid.draw(screen)
 
         for rule in rules:
             rule.draw(screen)
+
+        for i, (color_value, no_left, option_rect) in enumerate(zip(color_options, color_no_left, color_option_rects)):
+            color: pg.Color = enum_to_color[color_value]
+            pg.draw.rect(
+                screen,
+                color,
+                option_rect,
+                border_radius=COLOR_OPTION_BORDER_R,
+            )
+            border_color: pg.Color = COLOR_OPTION_BORDER_DEFAULT_COLOR
+            if i == selected_color_i:
+                border_color = COLOR_OPTION_BORDER_SELECTED_COLOR
+
+            pg.draw.rect(
+                screen,
+                border_color,
+                option_rect,
+                width=COLOR_OPTION_BORDER_W,
+                border_radius=COLOR_OPTION_BORDER_R,
+            )
+            
+            outline_sprite: pg.surface.Surface = COLOR_OPTION_FONT.render(f'{no_left}', True, game_data.text_outline_color)
+            directions: list[tuple[int, int]] = []
+            for x in range(-1, 2):
+                for y in range(-1, 2):
+                    directions.append((x*COLOR_OPTION_OUTLINE_W, y*COLOR_OPTION_OUTLINE_W))
+
+            outline_rect: pg.Rect = outline_sprite.get_rect()
+            outline_rect.center = option_rect.center
+
+            for (x_offset, y_offset) in directions:
+                screen.blit(outline_sprite, outline_rect.move(x_offset, y_offset))
+
+            sprite: pg.surface.Surface = COLOR_OPTION_FONT.render(f'{no_left}', True, game_data.text_color)
+            sprite_rect: pg.Rect = sprite.get_rect()
+            sprite_rect.center = option_rect.center
+
+            screen.blit(outline_sprite, outline_rect)
+            screen.blit(sprite, sprite_rect)
 
         await asyncio.sleep(0)
         pg.display.update()
