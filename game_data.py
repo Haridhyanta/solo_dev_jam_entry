@@ -24,9 +24,10 @@ class GameData(metaclass=Singleton):
         self.bg_color: tuple[int, int, int] = 0, 0, 0
 
         self.normal_font_path = r'./Roboto/static/Roboto-Medium.ttf'
-        self.normal_font = pg.font.Font(self.normal_font_path, 32)
+        self.normal_font = pg.font.Font(self.normal_font_path, 36)
         self.small_font = pg.font.Font(self.normal_font_path, 16)
         self.bold_font_path = r'./Roboto/static/Roboto-Bold.ttf'
         self.bold_font = pg.font.Font(self.bold_font_path, 32)
 
-        self.text_color: tuple[int, int, int] = 0, 0, 0
+        self.text_color: pg.Color = pg.Color(0, 0, 0)
+        self.text_outline_color: pg.Color = pg.Color("WHITE")

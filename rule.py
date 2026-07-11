@@ -15,6 +15,8 @@ class Rule:
             text_font: pg.font.Font,
             name_color: pg.Color,
             text_color: pg.Color,
+            outline_color: pg.Color,
+            outline_width: int,
             bg_rect: pg.Rect,
             bg_color: pg.Color,
             option_size: tuple[int, int],
@@ -26,6 +28,8 @@ class Rule:
         self.text_font: pg.font.Font = text_font
         self.name_color: pg.Color = name_color
         self.text_color: pg.Color = text_color
+        self.outline_color: pg.Color = outline_color
+        self.outline_width: int = outline_width
         self.bg_rect: pg.Rect = bg_rect
         self.bg_color: pg.Color = bg_color
         self.option_size: tuple[int, int] = option_size
@@ -82,11 +86,24 @@ class Rule:
                     pg.Color("Black"),
                     option_rect
                 )
+                outline_sprite: pg.surface.Surface = self.text_font.render("?", True, self.outline_color)
+                outline_width = self.outline_width
+                directions: list[tuple[int, int]] = []
+                for x in range(-1, 2):
+                    for y in range(-1, 2):
+                        directions.append((x*outline_width, y*outline_width))
+
+                outline_rect: pg.Rect = outline_sprite.get_rect()
+                outline_rect.center = option_rect.center
+
+                for (x_offset, y_offset) in directions:
+                    screen.blit(outline_sprite, outline_rect.move(x_offset, y_offset))
 
                 sprite: pg.surface.Surface = self.text_font.render("?", True, self.text_color)
                 sprite_rect: pg.Rect = sprite.get_rect()
                 sprite_rect.center = option_rect.center
 
+                screen.blit(outline_sprite, outline_rect)
                 screen.blit(sprite, sprite_rect)
                 continue
                 
@@ -103,13 +120,15 @@ class DRSpread(Rule):
             text_font: pg.font.Font,
             name_color: pg.Color,
             text_color: pg.Color,
+            outline_color: pg.Color,
+            outline_width: int,
             bg_rect: pg.Rect,
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
         name: str = "Down Right Spread"
         text: list[str] = ["The color", "spreads to the squares bellow and to the right of it."]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, bg_rect, bg_color, option_size)
+        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
 
     def step(self, grid: ColorGrid) -> None:
         selected_color = self.options[0]

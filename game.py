@@ -86,9 +86,11 @@ async def game() -> Scene:
             RULES_TEXT_FONT,
             game_data.text_color,
             game_data.text_color,
+            game_data.text_outline_color,
+            2,
             rules_rects[0],
             pg.Color("White"),
-            (rules_rects[0].w * 9 // 10, rules_rects[0].h//10)
+            (rules_rects[0].w * 9 // 10, rules_rects[0].h//9)
         ),
     ]
     
