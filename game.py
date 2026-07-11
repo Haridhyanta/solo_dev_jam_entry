@@ -28,8 +28,8 @@ async def game() -> Scene:
         pg.Rect(
             PLAY_GRID_DIST_FROM_EDGE,
             PLAY_GRID_DIST_FROM_EDGE,
-            (WIND_Y * 2)//5,
-            (WIND_Y * 2)//5,
+            (WIND_Y * 7)//20,
+            (WIND_Y * 7)//20,
         )
     )
 
@@ -39,12 +39,12 @@ async def game() -> Scene:
         pg.Rect(
             PLAY_GRID_DIST_FROM_EDGE,
             PLAY_GRID_DIST_FROM_EDGE,
-            (WIND_Y * 2)//5,
-            (WIND_Y * 2)//5,
+            (WIND_Y * 7)//20,
+            (WIND_Y * 7)//20,
         )
     )
 
-    solution_grid.bounding_rect.right = WIND_X - PLAY_GRID_DIST_FROM_EDGE
+    solution_grid.bounding_rect.bottom = WIND_Y - PLAY_GRID_DIST_FROM_EDGE
 
     # input_grid.bounding_rect.centery = WIND_Y//2
 
@@ -57,7 +57,7 @@ async def game() -> Scene:
             ]
         )
 
-    DIST_BTW_RULES_AND_EDGE: int = WIND_X//15
+    DIST_BTW_RULES_AND_EDGE: int = WIND_X//17
     DIST_BTW_RULES: int = WIND_X//20
 
     current_rule_rect: pg.Rect = pg.Rect(
@@ -67,17 +67,18 @@ async def game() -> Scene:
         WIND_Y // 3,
     )
 
-    current_rule_rect.bottomleft = DIST_BTW_RULES_AND_EDGE, WIND_Y-DIST_BTW_RULES_AND_EDGE
+    current_rule_rect.bottom = WIND_Y-DIST_BTW_RULES_AND_EDGE
+    current_rule_rect.right = WIND_X-DIST_BTW_RULES_AND_EDGE
 
-    RULES_NAME_FONT: pg.font.Font = game_data.normal_font
-    RULES_TEXT_FONT: pg.font.Font = game_data.bold_font
+    RULES_NAME_FONT: pg.font.Font = game_data.bold_font
+    RULES_TEXT_FONT: pg.font.Font = game_data.normal_font
 
     rules_rects: list[pg.Rect] = []
     no_of_rules: int = 1
     for i in range(no_of_rules):
         rules_rects.append(current_rule_rect.copy())
 
-        current_rule_rect.left = current_rule_rect.right + DIST_BTW_RULES
+        current_rule_rect.right = current_rule_rect.left - DIST_BTW_RULES
 
     rules: list[Rule] = [
         DRSpread(
