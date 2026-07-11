@@ -1,12 +1,14 @@
 from typing import Any, Callable, Coroutine
 import asyncio
 
+from game_data import GameData
 from scenes import Scene
 
 
 scenes_to_func: dict[Scene, Callable[[], Coroutine[Any, Any, Scene]]] = {}
 
 async def main():
+    GameData()
     current_scene: Scene = Scene.QUIT
 
     while current_scene != Scene.QUIT:
