@@ -15,7 +15,7 @@ class GameData(metaclass=Singleton):
         pg.font.init()
 
         WIND_X, WIND_Y = 1600, 900
-        self.screen: pg.surface.Surface = pg.display.set_mode((WIND_X, WIND_Y))
+        self.screen: pg.surface.Surface = pg.display.set_mode((WIND_X, WIND_Y), flags=pg.SRCALPHA)
         self.WIND_X, self.WIND_Y = WIND_X, WIND_Y
 
         self.clock: pg.time.Clock = pg.time.Clock()

@@ -182,18 +182,20 @@ async def game() -> Scene:
                         continue
 
                     matched = True
-                    for i, color_option in enumerate(color_options):
-                        if color_value == color_option:
-                            color_no_left[i] += 1
-                            break
 
                     new_color_value: Color = color_options[selected_color_i]
                     if color_value == new_color_value:
                         input_grid[x, y] = input_grid.default_color
+                        color_no_left[selected_color_i] += 1
                         break
                         
                     if color_no_left[selected_color_i] <= 0:
                         break
+
+                    for i, color_option in enumerate(color_options):
+                        if color_value == color_option:
+                            color_no_left[i] += 1
+                            break
 
                     color_no_left[selected_color_i] -= 1
                     input_grid[x, y] = color_options[selected_color_i]
