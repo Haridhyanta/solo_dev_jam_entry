@@ -43,13 +43,13 @@ class ColorGrid:
                 yield (x, y), self[x, y]
 
     def draw(self, screen: pg.surface.Surface) -> None:
-        pg.draw.rect(
-            screen,
-            pg.Color("White"),
-            self.bounding_rect,
-            1,
-            5
-        )
+        # pg.draw.rect(
+        #     screen,
+        #     pg.Color("White"),
+        #     self.bounding_rect,
+        #     1,
+        #     5
+        # )
 
         for (x, y), color in self.get_items():
             topleft = x*self.cell_w + self.bounding_rect.x, y*self.cell_h + self.bounding_rect.y
@@ -60,6 +60,9 @@ class ColorGrid:
                 pg_color,
                 rect
             )
+
+            if not self.draw_grid_line:
+                continue
 
             pg.draw.rect(
                 screen,

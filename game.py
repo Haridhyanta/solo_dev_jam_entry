@@ -28,9 +28,10 @@ async def game() -> Scene:
         pg.Rect(
             PLAY_GRID_DIST_FROM_EDGE,
             PLAY_GRID_DIST_FROM_EDGE,
-            (WIND_Y * 7)//20,
-            (WIND_Y * 7)//20,
-        )
+            (WIND_Y * 10)//20,
+            (WIND_Y * 10)//20,
+        ),
+        draw_grid_line=True
     )
 
     solution_grid: ColorGrid = ColorGrid(
@@ -39,9 +40,9 @@ async def game() -> Scene:
         pg.Rect(
             PLAY_GRID_DIST_FROM_EDGE,
             PLAY_GRID_DIST_FROM_EDGE,
-            (WIND_Y * 7)//20,
-            (WIND_Y * 7)//20,
-        )
+            (WIND_Y * 5)//20,
+            (WIND_Y * 5)//20,
+        ),
     )
 
     solution_grid.bounding_rect.bottom = WIND_Y - PLAY_GRID_DIST_FROM_EDGE
