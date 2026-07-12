@@ -154,6 +154,49 @@ class DRSpread(Rule):
         for (x, y) in new_squares:
             grid[x, y] = selected_color
 
+class SECover(Rule):
+    def __init__(
+            self,
+            name_font: pg.font.Font,
+            text_font: pg.font.Font,
+            name_color: pg.Color,
+            text_color: pg.Color,
+            outline_color: pg.Color,
+            outline_width: int,
+            bg_rect: pg.Rect,
+            bg_color: pg.Color,
+            option_size: tuple[int, int],
+        ) -> None:
+        name: str = "S-E Cover"
+        text: list[str] = [
+            "The color",
+            "spreads to the squares bellow and to the right of it unless the squares are of color",
+            ""
+        ]
+        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
+
+    def step(self, grid: ColorGrid) -> None:
+        selected_color = self.options[0]
+        cover_color = self.options[1]
+        if selected_color is None:
+            return
+        if cover_color is None:
+            return
+        new_squares: list[tuple[int, int]] = []
+        for (x, y), color in grid.get_items():
+            if color != selected_color:
+                continue
+
+            if (x, y+1) in grid and grid[x, y+1] != cover_color:
+                new_squares.append((x, y+1))
+
+            if (x+1, y) in grid and grid[x+1, y] != cover_color:
+                new_squares.append((x+1, y))
+
+        for (x, y) in new_squares:
+            grid[x, y] = selected_color
+
 NAME_TO_RULE: dict[str, type] = {
     "S-E Spread": DRSpread,
+    "S-E Cover": SECover,
 }
