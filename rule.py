@@ -74,6 +74,12 @@ class Rule:
             self.bg_rect
         )
 
+        pg.draw.rect(
+            screen,
+            self.text_color,
+            pg.Rect(*self.bg_rect.topleft, self.bg_rect.w, self.name_sprite_rect.h),
+            7,
+        )
         screen.blit(self.name_sprite, self.name_sprite_rect)
 
         for text_sprite, text_sprite_rect in zip(self.text_sprites, self.text_sprite_rects):
@@ -126,7 +132,7 @@ class DRSpread(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "Down Right Spread"
+        name: str = "S-E Spread"
         text: list[str] = ["The color", "spreads to the squares bellow and to the right of it."]
         super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
 

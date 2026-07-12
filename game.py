@@ -73,8 +73,8 @@ async def game() -> Scene:
     current_rule_rect: pg.Rect = pg.Rect(
         0, 
         0,
-        WIND_X // 5,
-        WIND_Y // 3,
+        WIND_X // 6,
+        (WIND_Y * 12) // 30,
     )
 
     current_rule_rect.bottom = WIND_Y-DIST_BTW_RULES_AND_EDGE
