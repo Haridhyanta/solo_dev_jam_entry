@@ -9,6 +9,7 @@ class Color(enum.IntEnum):
     WHITE = enum.auto()
     BLUE = enum.auto()
     PURPLE = enum.auto()
+    YELLOW = enum.auto()
 
 enum_to_color: list[PygameColor] = [
     PygameColor("Black"), # Should not be accessed
@@ -18,6 +19,7 @@ enum_to_color: list[PygameColor] = [
     PygameColor("White"),
     PygameColor("Blue"),
     PygameColor("Purple"),
+    PygameColor("Yellow")
 ]
 
 CHAR_TO_ENUM_COLOR: dict[str, Color] = {
@@ -27,4 +29,5 @@ CHAR_TO_ENUM_COLOR: dict[str, Color] = {
     'W': Color.WHITE,
     'B': Color.BLUE,
     'P': Color.PURPLE,
+    'Y': Color.YELLOW,
 }
