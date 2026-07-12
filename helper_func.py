@@ -5,7 +5,7 @@ import pygame as pg
 
 def text_sprite(
         font: pg.font.Font,
-        text: str,
+        text: str, 
         colour: pg.color.Color,
         *,
         extra_width: int = 0,
@@ -68,8 +68,10 @@ def text_wrap_mono(
     final_text: str = ''
     final_line_colors: dict[int, pg.Color] = {}
     final_line_fonts: dict[int, pg.font.Font] = {}
+    line_has_multiple_words: bool = False
 
     current_word_len: int = 0
+    current_word_width: int = 0
     if line_mono_fonts is not None and old_line_no in line_mono_fonts.keys():
         final_line_fonts[new_line_no] = line_mono_fonts[old_line_no]
 
@@ -83,6 +85,7 @@ def text_wrap_mono(
             current_word_len = 0
             old_line_no += 1
             new_line_no += 1
+            line_has_multiple_words = False
 
             if line_mono_fonts is not None:
                 line_font = mono_font
@@ -97,23 +100,29 @@ def text_wrap_mono(
             continue
 
         current_line_width += guess_width
+        current_word_width += guess_width
 
         is_space = ch.isspace()
         if not is_space:
             current_word_len += 1
         else:
+            line_has_multiple_words = True
             current_word_len = 0
+            current_word_width = 0
         
         if current_line_width > max_width and not is_space:
-            i = current_word_len
-            if i > 0:
-                final_text = final_text + ch
-                final_text = final_text[:-i] + '\n' + final_text[-i:]
+            if not line_has_multiple_words:
+                final_text = final_text + '\n' + ch
             else:
-                final_text = final_text + '\n'
-                final_text = final_text + ch
+                i = current_word_len
+                if i > 0:
+                    final_text = final_text + ch
+                    final_text = final_text[:-i] + '\n' + final_text[-i:]
+                else:
+                    final_text = final_text + '\n'
+                    final_text = final_text + ch
             new_line_no += 1
-            current_line_width = guess_width
+            current_line_width = current_word_width
 
             if line_mono_fonts is not None and old_line_no in line_mono_fonts.keys():
                 final_line_fonts[new_line_no] = line_mono_fonts[old_line_no]
@@ -133,36 +142,3 @@ def text_wrap_mono(
         line_fonts=final_line_fonts,
         center_text=center_text,
     )
-
-# pg.font.init()
-# mono_font = pg.font.Font(r'.\JetBrainsMono-2.304\fonts\ttf\JetBrainsMono-Regular.ttf', 32)
-# text = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%^&*()-=_+[]{};\':",.<>'
-# guess_w = mono_font.render(text[0], True, (0, 0, 0)).get_width()
-# for ch in text:
-#     if mono_font.render(ch, True, (0, 0, 0)).get_width() != guess_w:
-#         print(f'{ch=}, {mono_font.render(ch, True, (0, 0, 0)).get_width()=}, {guess_w=}')
-
-# class Test_Obj(Game_Obj):
-#     def __init__(self, rect, color) -> None:
-#         self.rect = rect
-#         self.color = color
-
-#     @scene(Scene.GAME)
-#     @drawer
-#     def draw(self, game: Game) -> Message_Type:
-#         pygame.draw.rect(game.screen, self.color, self.rect)
-#         pygame.draw.rect(game.screen, (255, 255, 255), self.rect, 1)
-#         return Message_Type.CONTINUE 
-
-# with open("test.txt", 'r+') as file:
-#     Game().spawn(load_game_objs_from_text_grid(
-#     file.read(), 
-#         {
-#             '1': lambda x: Test_Obj(x, (255, 0, 0)), 
-#             '2': lambda x: Test_Obj(x, (0, 255, 0)), 
-#         }
-#         , (50, 50), chars_to_ignore=['0']
-#         )
-#     )
-
-#     Game().start()
