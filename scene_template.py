@@ -24,5 +24,6 @@ async def generic_scene() -> Scene:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return Scene.QUIT
-
+            
         pg.display.update()
+        await asyncio.sleep(0)

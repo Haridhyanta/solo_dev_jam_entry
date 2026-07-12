@@ -3,11 +3,13 @@ import asyncio
 
 import pygame as pg
 from game import game
+from home import home
 from scenes import Scene
 from game_data import GameData
 from scenes import Scene
 
 scenes_to_func: dict[Scene, Callable[[], Coroutine[Any, Any, Scene]]] = {
+    Scene.HOME: home,
     Scene.GAME: game,
 }
 
