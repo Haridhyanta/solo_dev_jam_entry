@@ -14,7 +14,7 @@ class LevelInfo:
     rules: list[type]
 
 def load_level(level_no: int) -> LevelInfo:
-    FILE_PATH: str = f'./levels/level_1.json'
+    FILE_PATH: str = f'./levels/level_{level_no}.json'
     
     try:
         with open(FILE_PATH, "r") as file:

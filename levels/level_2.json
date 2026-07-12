@@ -1,0 +1,16 @@
+{
+    "name": "Level 2",
+    "solution": [
+        "BBBBBBBB",
+        "BBBBBBBB",
+        "BBRRRRRR",
+        "BBRRRRRR",
+        "BBRRRRRR",
+        "BBRRRRRR",
+        "BBRRRRRR",
+        "BBRRRRRR"
+    ],
+    "color_options": ["B", "R"],
+    "color_no_left": [1, 1],
+    "rules": ["S-E Spread", "S-E Cover"]
+}

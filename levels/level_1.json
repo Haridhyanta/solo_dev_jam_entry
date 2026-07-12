@@ -1,16 +1,16 @@
 {
     "name": "Level 1",
     "solution": [
-        "WWWWWWWW",
-        "WWWWWWWW",
-        "WWWWWWWW",
-        "WWWWWWWW",
-        "WWWWWWWW",
-        "WWWWWWWW",
-        "WWWWWWWW",
-        "WWWWWWWW"
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR"
     ],
-    "color_options": ["W"],
+    "color_options": ["R"],
     "color_no_left": [1],
     "rules": ["S-E Spread"]
 }

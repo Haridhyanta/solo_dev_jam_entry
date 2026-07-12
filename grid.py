@@ -90,5 +90,5 @@ class ColorGrid:
                 screen,
                 self.grid_color,
                 rect,
-                5
+                rect.w//20
             )

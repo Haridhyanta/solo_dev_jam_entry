@@ -29,6 +29,7 @@ async def game() -> Scene:
     dt: int = 0
 
     LEVEL_NO: int = game_data.level_no
+    print(f'{LEVEL_NO = }')
 
     LEVEL_INFO: LevelInfo = load_level(LEVEL_NO)
 
@@ -64,6 +65,7 @@ async def game() -> Scene:
             (WIND_Y * 5)//20,
             (WIND_Y * 5)//20,
         ),
+        draw_grid_line=True
     )
 
     solution_grid.grid = LEVEL_INFO.solution_grid
@@ -77,7 +79,7 @@ async def game() -> Scene:
         0, 
         0,
         WIND_X // 6,
-        (WIND_Y * 12) // 30,
+        (WIND_Y * 14) // 30,
     )
 
     current_rule_rect.bottom = WIND_Y-DIST_BTW_RULES_AND_EDGE
@@ -149,6 +151,9 @@ async def game() -> Scene:
                 return Scene.QUIT
             
             if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    game_data.level_no += 1
+                    return Scene.GAME
                 if event.key == pg.K_r:
                     time_since_last_step_ms = 0
                     current_mode = Mode.NOSTEP
