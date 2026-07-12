@@ -1,0 +1,23 @@
+{
+    "name": "Level 6: Escort",
+    "solution": [
+        "000WPW000",
+        "000WPW000",
+        "000WPW000",
+        "000WPW000",
+        "000WPW000",
+        "000WPW000",
+        "000WPW000",
+        "000WPW000",
+        "000WPW000",
+    ],
+    "color_options": ["W", "P", "Y"],
+    "color_no_left": [2, 1, 1],
+    "rules": ["S March", "S March", "S Replace", "Replace"],
+    "locked_options": {
+        "3": {
+            "0": "0",
+            "1": "P"
+        }
+    }
+}
