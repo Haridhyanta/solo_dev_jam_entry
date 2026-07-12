@@ -23,6 +23,8 @@ class GameData(metaclass=Singleton):
 
         self.bg_color: tuple[int, int, int] = 0, 0, 0
 
+        self.level_no: int = 1
+
         self.grey_out_color: pg.Color = pg.Color(50, 50, 50, 50)
 
         self.normal_font_path = r'./Roboto_Mono/static/RobotoMono-Regular.ttf'

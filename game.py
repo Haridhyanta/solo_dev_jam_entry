@@ -6,6 +6,7 @@ from color import Color, enum_to_color
 from game_data import GameData
 import pygame as pg
 from grid import ColorGrid
+from load_level import LevelInfo, load_level
 from rule import DRSpread, Rule
 from scenes import Scene
 
@@ -27,16 +28,27 @@ async def game() -> Scene:
     max_fps: float = game_data.max_fps
     dt: int = 0
 
-    PLAY_GRID_DIST_FROM_EDGE: int = (WIND_X) //17
+    LEVEL_NO: int = game_data.level_no
+
+    LEVEL_INFO: LevelInfo = load_level(LEVEL_NO)
+
+    DIST_BTW_LEVEL_TEXT_AND_EDGE: int = WIND_X // 25
+
+    level_text_sprite: pg.surface.Surface = game_data.large_font.render(LEVEL_INFO.name, True, game_data.text_color)
+    level_text_rect = level_text_sprite.get_rect()
+    level_text_rect.topleft = DIST_BTW_LEVEL_TEXT_AND_EDGE, DIST_BTW_LEVEL_TEXT_AND_EDGE
+
+    DIST_BTW_LEVEL_TEXT_AND_PLAY_GRID = WIND_X // 30
+    PLAY_GRID_DIST_FROM_EDGE: int = (WIND_X) //25
 
     input_grid: ColorGrid = ColorGrid(
-        8,
-        8,
+        len(LEVEL_INFO.solution_grid[0]),
+        len(LEVEL_INFO.solution_grid),
         pg.Rect(
             PLAY_GRID_DIST_FROM_EDGE,
-            PLAY_GRID_DIST_FROM_EDGE,
-            (WIND_Y * 10)//20,
-            (WIND_Y * 10)//20,
+            level_text_rect.bottom + DIST_BTW_LEVEL_TEXT_AND_PLAY_GRID,
+            (WIND_Y * 8)//20,
+            (WIND_Y * 8)//20,
         ),
         draw_grid_line=True
     )
@@ -44,8 +56,8 @@ async def game() -> Scene:
     simulation_grid: ColorGrid = input_grid.copy()
 
     solution_grid: ColorGrid = ColorGrid(
-        8,
-        8,
+        len(LEVEL_INFO.solution_grid[0]),
+        len(LEVEL_INFO.solution_grid),
         pg.Rect(
             PLAY_GRID_DIST_FROM_EDGE,
             PLAY_GRID_DIST_FROM_EDGE,
@@ -54,18 +66,9 @@ async def game() -> Scene:
         ),
     )
 
+    solution_grid.grid = LEVEL_INFO.solution_grid
+
     solution_grid.bounding_rect.bottom = WIND_Y - PLAY_GRID_DIST_FROM_EDGE
-
-    # input_grid.bounding_rect.centery = WIND_Y//2
-
-    for (x, y), _ in solution_grid.get_items():
-        solution_grid[(x, y)] = choice(
-            [
-                Color.BLACK,
-                Color.RED,
-                Color.GREEN,
-            ]
-        )
 
     DIST_BTW_RULES_AND_EDGE: int = WIND_X//17
     DIST_BTW_RULES: int = WIND_Y//30
@@ -84,28 +87,28 @@ async def game() -> Scene:
     RULES_TEXT_FONT: pg.font.Font = game_data.normal_font
 
     rules_rects: list[pg.Rect] = []
-    no_of_rules: int = 1
+    no_of_rules: int = len(LEVEL_INFO.rules)
     for i in range(no_of_rules):
         rules_rects.append(current_rule_rect.copy())
 
         current_rule_rect.right = current_rule_rect.left - DIST_BTW_RULES
 
     rules: list[Rule] = [
-        DRSpread(
+        rule_type(
             RULES_NAME_FONT,
             RULES_TEXT_FONT,
             game_data.text_color,
             game_data.text_color,
             game_data.text_outline_color,
             2,
-            rules_rects[0],
+            rules_rects[i],
             pg.Color("White"),
-            (rules_rects[0].w * 9 // 10, rules_rects[0].h//9)
-        ),
+            (rules_rects[i].w * 9 // 10, rules_rects[i].h//9)
+        ) for i, rule_type in enumerate(LEVEL_INFO.rules)
     ]
     
-    color_options: list[Color] = [Color.RED, Color.GREEN]
-    color_no_left: list[int] = [1, 1]
+    color_options: list[Color] = LEVEL_INFO.color_options
+    color_no_left: list[int] = LEVEL_INFO.color_no_left
     color_option_rects: list[pg.Rect] = []
     selected_color_i: int = -1
 
@@ -327,5 +330,19 @@ async def game() -> Scene:
                 pixel.fill(game_data.grey_out_color)
                 screen.blit(pixel, option_rect, special_flags=pg.BLEND_RGB_MULT)
 
+        outline_sprite: pg.surface.Surface = COLOR_OPTION_FONT.render(LEVEL_INFO.name, True, game_data.text_outline_color)
+        directions: list[tuple[int, int]] = []
+        for x in range(-1, 2):
+            for y in range(-1, 2):
+                directions.append((x*COLOR_OPTION_OUTLINE_W, y*COLOR_OPTION_OUTLINE_W))
+
+        outline_rect: pg.Rect = outline_sprite.get_rect()
+        outline_rect.center = level_text_rect.center
+
+        for (x_offset, y_offset) in directions:
+            screen.blit(outline_sprite, outline_rect.move(x_offset, y_offset))
+
+        screen.blit(outline_sprite, outline_rect)
+        screen.blit(level_text_sprite, level_text_rect)
         await asyncio.sleep(0)
         pg.display.update()

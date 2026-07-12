@@ -153,3 +153,7 @@ class DRSpread(Rule):
 
         for (x, y) in new_squares:
             grid[x, y] = selected_color
+
+NAME_TO_RULE: dict[str, type] = {
+    "S-E Spread": DRSpread,
+}
