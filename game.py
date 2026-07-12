@@ -137,6 +137,28 @@ async def game() -> Scene:
     for _ in color_options:
         color_option_rects.append(current_option_rect.copy())
         current_option_rect.right = current_option_rect.left - DIST_BTW_COLOR_OPTIONS
+    
+    winning_screen_bg_rect = pg.Rect(0, 0, (WIND_X*3)//5, (WIND_Y*3)//5)
+    winning_screen_bg_rect.center = WIND_X//2, WIND_Y//2
+
+    WINNING_TEXT_COLOR: pg.Color = game_data.text_color
+    WINNING_BG_RECT_COLOR: pg.Color = pg.Color("White")
+    WINNING_BG_RECT_R: int = 5
+    DIST_BTW_WINNING_TEXT_FROM_EDGE: int = WIND_Y//25
+
+    winning_text_sprite: pg.surface.Surface = game_data.ui_large_font.render('YOU WON!', True, WINNING_TEXT_COLOR)
+    winning_text_rect: pg.Rect = winning_text_sprite.get_rect()
+    winning_text_rect.centerx = winning_screen_bg_rect.centerx
+    winning_text_rect.top = winning_screen_bg_rect.top + DIST_BTW_WINNING_TEXT_FROM_EDGE
+
+    DIST_BTW_NEXT_LEVEL_ARROW_AND_EDGE: int = WIND_Y//25
+
+    next_level_img: pg.surface.Surface = game_data.next_level_img
+    next_level_rect: pg.Rect = next_level_img.get_rect()
+    next_level_rect.right = winning_screen_bg_rect.right - DIST_BTW_NEXT_LEVEL_ARROW_AND_EDGE
+    next_level_rect.bottom = winning_screen_bg_rect.bottom - DIST_BTW_NEXT_LEVEL_ARROW_AND_EDGE
+
+    has_won: bool = False
 
     TIME_BTW_STEPS_MS: int = 500
     TIME_BTW_STEPS_MS_FAST_MODE: int = 200
@@ -168,6 +190,7 @@ async def game() -> Scene:
                     time_since_last_step_ms = 0
                     for rule in rules:
                         rule.step(simulation_grid)
+                    has_won = has_won or simulation_grid.grid == solution_grid.grid
 
                 if event.key == pg.K_k:
                     time_since_last_step_ms = 0
@@ -204,6 +227,13 @@ async def game() -> Scene:
                 continue
 
             if event.type == pg.MOUSEBUTTONDOWN:
+                if has_won:
+                    if not next_level_rect.collidepoint(event.pos):
+                        continue
+
+                    game_data.level_no += 1
+                    return Scene.GAME
+
                 if current_mode != Mode.NOSTEP:
                     continue
 
@@ -307,6 +337,9 @@ async def game() -> Scene:
                 pixel.fill(game_data.grey_out_color)
                 screen.blit(pixel, rule.bg_rect, special_flags=pg.BLEND_RGB_MULT)
 
+        if should_step and not has_won:
+            has_won = simulation_grid.grid == solution_grid.grid
+
         for i, (color_value, no_left, option_rect) in enumerate(zip(color_options, color_no_left, color_option_rects)):
             color: pg.Color = enum_to_color[color_value]
             pg.draw.rect(
@@ -366,4 +399,9 @@ async def game() -> Scene:
         screen.blit(outline_sprite, outline_rect)
         screen.blit(level_text_sprite, level_text_rect)
         await asyncio.sleep(0)
+        if has_won:
+            pg.draw.rect(screen, WINNING_BG_RECT_COLOR, winning_screen_bg_rect, border_radius=WINNING_BG_RECT_R)
+            screen.blit(winning_text_sprite, winning_text_rect)
+
+            screen.blit(next_level_img, next_level_rect)
         pg.display.update()
