@@ -5,17 +5,13 @@
         "BBBBRRRR",
         "BBBBRRRR",
         "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR"
+        "RRRRBBBB",
+        "RRRRBBBB",
+        "RRRRBBBB",
+        "RRRRBBBB"
     ],
-    "color_options": ["B", "R", "P"],
-    "color_no_left": [1, 1, 1],
-    "rules": ["S-E Spread", "S-W Cover", "N-E Replace"],
-    "locked_options": {
-        "1": {
-            "0": "P"
-        }
-    }
+    "color_options": ["B", "R"],
+    "color_no_left": [2, 2],
+    "rules": ["S-E Cover", "S-W Cover"],
+    "locked_options": {}
 }

@@ -1,0 +1,17 @@
+{
+    "name": "Level 4",
+    "solution": [
+        "000RRRRR",
+        "000R000R",
+        "000R000R",
+        "000R000R",
+        "000R000R",
+        "000R000R",
+        "000R000R",
+        "RRRR000R"
+    ],
+    "color_options": ["Y", "R", "P"],
+    "color_no_left": [2, 1, 2],
+    "rules": ["Replace", "Replace", "E March", "N March"],
+    "locked_options": {}
+}
