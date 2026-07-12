@@ -33,14 +33,14 @@ async def game() -> Scene:
 
     LEVEL_INFO: LevelInfo = load_level(LEVEL_NO)
 
-    DIST_BTW_LEVEL_TEXT_AND_EDGE: int = WIND_X // 25
+    DIST_BTW_LEVEL_TEXT_AND_EDGE: int = WIND_Y // 20
 
     level_text_sprite: pg.surface.Surface = game_data.large_font.render(LEVEL_INFO.name, True, game_data.text_color)
     level_text_rect = level_text_sprite.get_rect()
     level_text_rect.topleft = DIST_BTW_LEVEL_TEXT_AND_EDGE, DIST_BTW_LEVEL_TEXT_AND_EDGE
 
-    DIST_BTW_LEVEL_TEXT_AND_PLAY_GRID = WIND_X // 30
-    PLAY_GRID_DIST_FROM_EDGE: int = (WIND_X) //25
+    DIST_BTW_LEVEL_TEXT_AND_PLAY_GRID = WIND_Y // 25
+    PLAY_GRID_DIST_FROM_EDGE: int = (WIND_Y) //20
 
     input_grid: ColorGrid = ColorGrid(
         len(LEVEL_INFO.solution_grid[0]),
@@ -72,13 +72,13 @@ async def game() -> Scene:
 
     solution_grid.bounding_rect.bottom = WIND_Y - PLAY_GRID_DIST_FROM_EDGE
 
-    DIST_BTW_RULES_AND_EDGE: int = WIND_X//17
+    DIST_BTW_RULES_AND_EDGE: int = WIND_Y//17
     DIST_BTW_RULES: int = WIND_Y//30
 
     current_rule_rect: pg.Rect = pg.Rect(
         0, 
         0,
-        WIND_X // 6,
+        WIND_X // 8,
         (WIND_Y * 14) // 30,
     )
 
