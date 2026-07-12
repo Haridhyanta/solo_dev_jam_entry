@@ -12,6 +12,10 @@
     ],
     "color_options": ["B", "R", "P"],
     "color_no_left": [1, 1, 1],
-    "rules": ["N-E Cover", "N-W Cover", "N March"],
-    "locked_options": {}
+    "rules": ["S-E Spread", "S-W Cover", "N-E Replace"],
+    "locked_options": {
+        "1": {
+            "0": "P"
+        }
+    }
 }

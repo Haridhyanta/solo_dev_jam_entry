@@ -16,7 +16,7 @@ class GameData(metaclass=Singleton):
 
         WIND_X, WIND_Y = 2100, 900
         self.screen: pg.surface.Surface = pg.display.set_mode((WIND_X, WIND_Y), flags=pg.SRCALPHA)
-        self.WIND_X, self.WIND_Y = WIND_X, WIND_Y
+        self.WIND_X, self.WIND_Y = self.screen.get_size()
 
         self.clock: pg.time.Clock = pg.time.Clock()
         self.max_fps: float = 0
