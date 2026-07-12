@@ -95,6 +95,8 @@ async def game() -> Scene:
 
         current_rule_rect.right = current_rule_rect.left - DIST_BTW_RULES
 
+    rules_rects.reverse()
+
     rules: list[Rule] = [
         rule_type(
             RULES_NAME_FONT,
