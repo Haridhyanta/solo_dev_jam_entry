@@ -108,6 +108,10 @@ async def game() -> Scene:
             (rules_rects[i].w * 9 // 10, rules_rects[i].h//11)
         ) for i, rule_type in enumerate(LEVEL_INFO.rules)
     ]
+
+    for rule_i, locked_options in LEVEL_INFO.locked_options.items():
+        for option_i, locked_color in locked_options.items():
+            rules[rule_i].options[option_i] = locked_color
     
     color_options: list[Color] = LEVEL_INFO.color_options
     color_no_left: list[int] = LEVEL_INFO.color_no_left
@@ -226,12 +230,16 @@ async def game() -> Scene:
                 if selected_color_i < 0:
                     continue
 
-                for rule in rules:
+                for rule_i, rule in enumerate(rules):
                     for i, color_input_rect in enumerate(rule.option_rects):
                         if not color_input_rect.collidepoint(mouse_pos):
                             continue
 
                         matched = True
+
+                        if rule_i in LEVEL_INFO.locked_options:
+                            if i in LEVEL_INFO.locked_options[rule_i]:
+                                break
 
                         rule.options[i] = color_options[selected_color_i]
                         break
@@ -281,10 +289,18 @@ async def game() -> Scene:
         if should_step:
             time_since_last_step_ms = 0
 
-        for rule in rules:
+        for i, rule in enumerate(rules):
             if should_step:
                 rule.step(simulation_grid)
             rule.draw(screen)
+
+            if i in LEVEL_INFO.locked_options:
+                for locked_option_i in LEVEL_INFO.locked_options[i]:
+                    padlock_rect: pg.Rect = game_data.padlock_img.get_rect()
+
+                    padlock_rect.center = rule.option_rects[locked_option_i].center
+
+                    screen.blit(game_data.padlock_img, padlock_rect)
 
             if current_mode != Mode.NOSTEP:
                 pixel: pg.Surface = pg.Surface(rule.bg_rect.size, flags=pg.SRCALPHA)

@@ -1,0 +1,17 @@
+{
+    "name": "Level 3",
+    "solution": [
+        "BBBBRRRR",
+        "BBBBRRRR",
+        "BBBBRRRR",
+        "BBBBRRRR",
+        "BBBBRRRR",
+        "BBBBRRRR",
+        "BBBBRRRR",
+        "BBBBRRRR"
+    ],
+    "color_options": ["B", "R", "P"],
+    "color_no_left": [1, 1, 1],
+    "rules": ["N-E Cover", "N-W Cover", "N March"],
+    "locked_options": {}
+}

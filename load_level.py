@@ -12,6 +12,7 @@ class LevelInfo:
     color_options: list[Color]
     color_no_left: list[int]
     rules: list[type]
+    locked_options: dict[int, dict[int, Color]]
 
 def load_level(level_no: int) -> LevelInfo:
     FILE_PATH: str = f'./levels/level_{level_no}.json'
@@ -35,12 +36,20 @@ def load_level(level_no: int) -> LevelInfo:
 
             rules: list[type] = list(map(lambda x: NAME_TO_RULE[x], loaded_data["rules"]))
 
+            locked_options: dict[int, dict[int, Color]] = {}
+            for key, value in loaded_data["locked_options"].items():
+                option: dict[int, Color] = {}
+                for i_str, color_ch in value.items():
+                    option[int(i_str)] = CHAR_TO_ENUM_COLOR[color_ch]
+                locked_options[int(key)] = option
+
             return LevelInfo(
                 name,
                 solution_grid,
                 color_options,
                 color_no_left,
-                rules
+                rules,
+                locked_options,
             )
 
     except FileNotFoundError:

@@ -34,5 +34,7 @@ class GameData(metaclass=Singleton):
         self.bold_font_path = r'./Roboto_Mono/static/RobotoMono-SemiBold.ttf'
         self.bold_font = pg.font.Font(self.bold_font_path, 32)
 
+        self.padlock_img: pg.surface.Surface = pg.transform.scale(pg.image.load('./img/padlock.png'), (50, 50))
+
         self.text_color: pg.Color = pg.Color(0, 0, 0)
         self.text_outline_color: pg.Color = pg.Color("WHITE")
