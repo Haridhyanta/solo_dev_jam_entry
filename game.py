@@ -105,7 +105,7 @@ async def game() -> Scene:
             2,
             rules_rects[i],
             pg.Color("White"),
-            (rules_rects[i].w * 9 // 10, rules_rects[i].h//9)
+            (rules_rects[i].w * 9 // 10, rules_rects[i].h//11)
         ) for i, rule_type in enumerate(LEVEL_INFO.rules)
     ]
     
