@@ -17,7 +17,7 @@ enum_to_color: list[PygameColor] = [
     PygameColor("Red"),
     PygameColor("Green"),
     PygameColor("White"),
-    PygameColor("Blue"),
+    PygameColor(33, 165, 213),
     PygameColor("Purple"),
     PygameColor("Yellow")
 ]
