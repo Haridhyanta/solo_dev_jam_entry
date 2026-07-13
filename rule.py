@@ -106,7 +106,7 @@ class Rule:
                     pg.Color("Black"),
                     option_rect
                 )
-                outline_sprite: pg.surface.Surface = self.text_font.render("?", True, self.outline_color)
+                outline_sprite: pg.surface.Surface = self.text_font.render("NOT SELECTED", True, self.outline_color)
                 outline_width = self.outline_width
                 directions: list[tuple[int, int]] = []
                 for x in range(-1, 2):
@@ -119,11 +119,11 @@ class Rule:
                 for (x_offset, y_offset) in directions:
                     screen.blit(outline_sprite, outline_rect.move(x_offset, y_offset))
 
-                sprite: pg.surface.Surface = self.text_font.render("?", True, self.text_color)
+                sprite: pg.surface.Surface = self.text_font.render("NOT SELECTED", True, pg.Color("White"))
                 sprite_rect: pg.Rect = sprite.get_rect()
                 sprite_rect.center = option_rect.center
 
-                screen.blit(outline_sprite, outline_rect)
+                # screen.blit(outline_sprite, outline_rect)
                 screen.blit(sprite, sprite_rect)
                 continue
                 
