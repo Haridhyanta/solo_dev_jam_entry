@@ -519,14 +519,6 @@ async def game() -> Scene:
             pixel.fill(game_data.grey_out_color)
             screen.blit(pixel, step_rect, special_flags=pg.BLEND_RGB_MULT)
             screen.blit(pixel, reset_rect, special_flags=pg.BLEND_RGB_MULT)
-
-        if has_won:
-            pg.draw.rect(screen, WINNING_BG_RECT_COLOR, winning_screen_bg_rect, border_radius=WINNING_BG_RECT_R)
-            screen.blit(winning_text_sprite, winning_text_rect)
-
-            screen.blit(next_level_img, next_level_rect)
-
-            screen.blit(winning_home_img, winning_home_rect)
         
         # Tutorial prompts
         if LEVEL_NO == 1:
@@ -546,6 +538,18 @@ async def game() -> Scene:
                 tutorial_prompt_rect: pg.Rect = game_data.tutorial_prompt_4.get_rect()
                 tutorial_prompt_rect.midtop = pause_rect.midbottom
                 screen.blit(game_data.tutorial_prompt_4, tutorial_prompt_rect)
+            else:
+                tutorial_prompt_rect: pg.Rect = game_data.tutorial_prompt_5.get_rect()
+                tutorial_prompt_rect.midleft = solution_grid.bounding_rect.midright
+                screen.blit(game_data.tutorial_prompt_5, tutorial_prompt_rect)
+
+        if has_won:
+            pg.draw.rect(screen, WINNING_BG_RECT_COLOR, winning_screen_bg_rect, border_radius=WINNING_BG_RECT_R)
+            screen.blit(winning_text_sprite, winning_text_rect)
+
+            screen.blit(next_level_img, next_level_rect)
+
+            screen.blit(winning_home_img, winning_home_rect)
 
         pg.display.update()
         await asyncio.sleep(0)

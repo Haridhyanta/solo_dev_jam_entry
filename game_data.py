@@ -54,6 +54,7 @@ class GameData(metaclass=Singleton):
         self.tutorial_prompt_2: pg.surface.Surface = pg.image.load('./img/tutorial_prompt_2.png')
         self.tutorial_prompt_3: pg.surface.Surface = pg.image.load('./img/tutorial_prompt_3.png')
         self.tutorial_prompt_4: pg.surface.Surface = pg.image.load('./img/tutorial_prompt_4.png')
+        self.tutorial_prompt_5: pg.surface.Surface = pg.image.load('./img/tutorial_prompt_5.png')
 
         self.text_color: pg.Color = pg.Color(0, 0, 0)
         self.text_outline_color: pg.Color = pg.Color("WHITE")
