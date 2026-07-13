@@ -13,9 +13,9 @@
     ],
     "color_options": ["R", "P", "Y"],
     "color_no_left": [2, 1, 1],
-    "rules": ["S March", "N-E Spread", "Replace", "S March", "S-E Replace"],
+    "rules": ["S-E Replace", "S March", "N-E Spread", "Replace", "S March"],
     "locked_options": {
-        "4": {
+        "0": {
             "0": "0",
             "1": "P"
         }
