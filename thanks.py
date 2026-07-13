@@ -35,6 +35,12 @@ async def thanks() -> Scene:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return Scene.QUIT
+
+            if event.type == pg.MOUSEBUTTONDOWN:
+                return Scene.HOME
+            
+            if event.type == pg.KEYDOWN:
+                return Scene.HOME
             
         screen.blit(THANK_YOU_SPRITE, thank_you_rect)
         pg.display.update()
