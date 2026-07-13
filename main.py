@@ -21,11 +21,16 @@ GameData()
 
 async def main():
     current_scene: Scene = Scene.HOME
+    pg.mixer.init(44100, -16, 2, 2620)
+    pg.mixer.music.load('./music/alex-morgan-jazz-rainy-night-music-563584.ogg')
+    pg.mixer.music.set_volume(0.5)
+    pg.mixer.music.play(loops=-1)
 
     while current_scene != Scene.QUIT:
         current_scene = await scenes_to_func[current_scene]()
         await asyncio.sleep(0)
 
+    pg.mixer_music.stop()
     pg.quit()
     
 if __name__ == '__main__':
