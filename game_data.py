@@ -15,6 +15,8 @@ class GameData(metaclass=Singleton):
         pg.init()
         pg.font.init()
 
+        self.music_is_paused: bool = False
+
         WIND_X, WIND_Y = 2100, 900
         self.screen: pg.surface.Surface = pg.display.set_mode((WIND_X, WIND_Y), flags=pg.SRCALPHA)
         self.WIND_X, self.WIND_Y = self.screen.get_size()
@@ -51,6 +53,8 @@ class GameData(metaclass=Singleton):
         self.reset_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/reset.png'), 4.0)
         self.home_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/home.png'), 3.0)
         self.homepage_img: pg.surface.Surface = pg.image.load('./img/homepage.png')
+        self.audio_on_img: pg.surface.Surface = pg.transform.scale(pg.image.load('./img/audio_on.png'), self.home_img.get_size())
+        self.audio_off_img: pg.surface.Surface = pg.transform.scale(pg.image.load('./img/audio_off.png'), self.home_img.get_size())
         self.background_img: pg.surface.Surface = pg.image.load('./img/background.png')
         self.tutorial_prompt_1: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/tutorial_prompt_1.png'), 2)
         self.tutorial_prompt_2: pg.surface.Surface = pg.image.load('./img/tutorial_prompt_2.png')

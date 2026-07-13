@@ -34,6 +34,11 @@ async def game() -> Scene:
     normal_home_rect: pg.Rect = normal_home_img.get_rect()
     normal_home_rect.topleft = DIST_BTW_HOME_IMG_AND_EDGE, DIST_BTW_HOME_IMG_AND_EDGE
 
+    audio_on_img: pg.surface.Surface = game_data.audio_on_img
+    audio_off_img: pg.surface.Surface = game_data.audio_off_img
+    audio_rect: pg.Rect = audio_on_img.get_rect()
+    audio_rect.topleft = normal_home_rect.topright
+
     LEVEL_NO: int = game_data.level_no
 
     LEVEL_INFO: LevelInfo = load_level(LEVEL_NO)
@@ -43,7 +48,7 @@ async def game() -> Scene:
 
     level_text_sprite: pg.surface.Surface = game_data.large_font.render(LEVEL_INFO.name, True, game_data.text_color)
     level_text_rect = level_text_sprite.get_rect()
-    level_text_rect.left = normal_home_rect.right + DIST_BTW_HOME_IMG_AND_LEVEL_TEXT
+    level_text_rect.left = audio_rect.right + DIST_BTW_HOME_IMG_AND_LEVEL_TEXT
     level_text_rect.top = DIST_BTW_LEVEL_TEXT_AND_EDGE
 
     DIST_BTW_LEVEL_TEXT_AND_PLAY_GRID = WIND_Y // 25
@@ -270,6 +275,13 @@ async def game() -> Scene:
                 continue
 
             if event.type == pg.MOUSEBUTTONDOWN:
+                if audio_rect.collidepoint(event.pos):
+                    game_data.music_is_paused = not game_data.music_is_paused
+                    if game_data.music_is_paused:
+                        pg.mixer.music.pause()
+                    else:
+                        pg.mixer.music.unpause()
+                    continue
                 if has_won:
                     game_data.max_level_no = max(LEVEL_NO+1, game_data.max_level_no)
                     if next_level_rect.collidepoint(event.pos):
@@ -526,10 +538,19 @@ async def game() -> Scene:
         pg.draw.rect(
             screen,
             pg.Color("White"),
-                normal_home_rect.move(-10, -10).inflate(30, 30),
+                normal_home_rect.inflate(20, 20),
             10
         )
         screen.blit(normal_home_img, normal_home_rect)
+
+        # audio icon
+        pg.draw.rect(
+            screen,
+            pg.Color("White"),
+                audio_rect.inflate(20, 20),
+            10
+        )
+        screen.blit(audio_off_img if game_data.music_is_paused else audio_on_img, audio_rect)
 
         # step and reset option
         screen.blit(step_img, step_rect)
