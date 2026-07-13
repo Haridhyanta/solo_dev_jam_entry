@@ -47,6 +47,7 @@ class GameData(metaclass=Singleton):
         self.unpause_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/unpause.png'), 4.0)
         self.step_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/step.png'), 4.0)
         self.reset_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/reset.png'), 4.0)
+        self.home_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/home.png'), 3.0)
         self.homepage_img: pg.surface.Surface = pg.image.load('./img/homepage.png')
         self.background_img: pg.surface.Surface = pg.image.load('./img/background.png')
 

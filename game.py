@@ -28,15 +28,23 @@ async def game() -> Scene:
     max_fps: float = game_data.max_fps
     dt: int = 0
 
+    DIST_BTW_HOME_IMG_AND_EDGE: int = 0# WIND_Y // 25
+
+    normal_home_img: pg.surface.Surface = game_data.home_img
+    normal_home_rect: pg.Rect = normal_home_img.get_rect()
+    normal_home_rect.topleft = DIST_BTW_HOME_IMG_AND_EDGE, DIST_BTW_HOME_IMG_AND_EDGE
+
     LEVEL_NO: int = game_data.level_no
 
     LEVEL_INFO: LevelInfo = load_level(LEVEL_NO)
 
     DIST_BTW_LEVEL_TEXT_AND_EDGE: int = WIND_Y // 20
+    DIST_BTW_HOME_IMG_AND_LEVEL_TEXT: int = WIND_Y // 25
 
     level_text_sprite: pg.surface.Surface = game_data.large_font.render(LEVEL_INFO.name, True, game_data.text_color)
     level_text_rect = level_text_sprite.get_rect()
-    level_text_rect.topleft = DIST_BTW_LEVEL_TEXT_AND_EDGE, DIST_BTW_LEVEL_TEXT_AND_EDGE
+    level_text_rect.left = normal_home_rect.right + DIST_BTW_HOME_IMG_AND_LEVEL_TEXT
+    level_text_rect.top = DIST_BTW_LEVEL_TEXT_AND_EDGE
 
     DIST_BTW_LEVEL_TEXT_AND_PLAY_GRID = WIND_Y // 25
     PLAY_GRID_DIST_FROM_EDGE: int = (WIND_Y) //20
@@ -173,12 +181,17 @@ async def game() -> Scene:
     winning_text_rect.centerx = winning_screen_bg_rect.centerx
     winning_text_rect.top = winning_screen_bg_rect.top + DIST_BTW_WINNING_TEXT_FROM_EDGE
 
-    DIST_BTW_NEXT_LEVEL_ARROW_AND_EDGE: int = WIND_Y//25
+    DIST_BTW_WINNING_ICONS_AND_EDGE: int = WIND_Y//25
 
     next_level_img: pg.surface.Surface = game_data.next_level_img
     next_level_rect: pg.Rect = next_level_img.get_rect()
-    next_level_rect.right = winning_screen_bg_rect.right - DIST_BTW_NEXT_LEVEL_ARROW_AND_EDGE
-    next_level_rect.bottom = winning_screen_bg_rect.bottom - DIST_BTW_NEXT_LEVEL_ARROW_AND_EDGE
+    next_level_rect.right = winning_screen_bg_rect.right - DIST_BTW_WINNING_ICONS_AND_EDGE
+    next_level_rect.bottom = winning_screen_bg_rect.bottom - DIST_BTW_WINNING_ICONS_AND_EDGE
+
+    winning_home_img: pg.surface.Surface = game_data.home_img
+    winning_home_rect: pg.Rect = winning_home_img.get_rect()
+    winning_home_rect.left = winning_screen_bg_rect.left + DIST_BTW_WINNING_ICONS_AND_EDGE
+    winning_home_rect.bottom = winning_screen_bg_rect.bottom - DIST_BTW_WINNING_ICONS_AND_EDGE
 
     has_won: bool = False
 
@@ -257,11 +270,17 @@ async def game() -> Scene:
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 if has_won:
-                    if not next_level_rect.collidepoint(event.pos):
-                        continue
+                    if next_level_rect.collidepoint(event.pos):
+                        game_data.level_no += 1
+                        return Scene.GAME
 
-                    game_data.level_no += 1
-                    return Scene.GAME
+                    if winning_home_rect.collidepoint(event.pos):
+                        return Scene.HOME
+
+                    continue
+
+                if normal_home_rect.collidepoint(event.pos):
+                    return Scene.HOME
 
                 if pause_rect.collidepoint(event.pos):
                     time_since_last_step_ms = 0
@@ -481,6 +500,15 @@ async def game() -> Scene:
         screen.blit(outline_sprite, outline_rect)
         screen.blit(level_text_sprite, level_text_rect)
 
+        # normal home icon
+        pg.draw.rect(
+            screen,
+            pg.Color("White"),
+                normal_home_rect.move(-10, -10).inflate(30, 30),
+            10
+        )
+        screen.blit(normal_home_img, normal_home_rect)
+
         # step and reset option
         screen.blit(step_img, step_rect)
         screen.blit(reset_img, reset_rect)
@@ -495,5 +523,7 @@ async def game() -> Scene:
             screen.blit(winning_text_sprite, winning_text_rect)
 
             screen.blit(next_level_img, next_level_rect)
+
+            screen.blit(winning_home_img, winning_home_rect)
         pg.display.update()
         await asyncio.sleep(0)
