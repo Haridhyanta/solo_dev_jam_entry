@@ -27,10 +27,10 @@ async def home() -> Scene:
                 return Scene.QUIT
 
             if event.type == pg.MOUSEBUTTONDOWN:
-                return Scene.GAME
+                return Scene.LEVEL
             
             if event.type == pg.KEYDOWN:
-                return Scene.GAME
+                return Scene.LEVEL
             
         screen.blit(bg_img, (0, 0))
 

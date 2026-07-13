@@ -4,6 +4,7 @@ import asyncio
 import pygame as pg
 from game import game
 from home import home
+from level import level
 from scenes import Scene
 from game_data import GameData
 from scenes import Scene
@@ -11,6 +12,7 @@ from scenes import Scene
 scenes_to_func: dict[Scene, Callable[[], Coroutine[Any, Any, Scene]]] = {
     Scene.HOME: home,
     Scene.GAME: game,
+    Scene.LEVEL: level,
 }
 
 GameData()

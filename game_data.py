@@ -1,3 +1,4 @@
+import os
 import pathlib
 
 import pygame as pg
@@ -24,7 +25,12 @@ class GameData(metaclass=Singleton):
         self.bg_color: tuple[int, int, int] = 0, 0, 0
 
         self.level_no: int = 1
-
+        self.total_no_of_levels: int = 1
+        while True:
+            if not os.path.exists(f'./levels/level_{self.total_no_of_levels+1}.json'):
+                break
+            self.total_no_of_levels += 1
+            
         self.grey_out_color: pg.Color = pg.Color(50, 50, 50, 50)
 
         self.normal_font_path = r'./Roboto_Mono/static/RobotoMono-Regular.ttf'
@@ -42,6 +48,7 @@ class GameData(metaclass=Singleton):
         self.step_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/step.png'), 4.0)
         self.reset_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/reset.png'), 4.0)
         self.homepage_img: pg.surface.Surface = pg.image.load('./img/homepage.png')
+        self.background_img: pg.surface.Surface = pg.image.load('./img/background.png')
 
         self.text_color: pg.Color = pg.Color(0, 0, 0)
         self.text_outline_color: pg.Color = pg.Color("WHITE")
