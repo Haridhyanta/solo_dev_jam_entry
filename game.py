@@ -139,6 +139,8 @@ async def game() -> Scene:
         color_option_rects.append(current_option_rect.copy())
         current_option_rect.right = current_option_rect.left - DIST_BTW_COLOR_OPTIONS
 
+    can_unpause: bool = False
+
     pause_img: pg.surface.Surface = game_data.pause_img
     unpause_img: pg.surface.Surface = game_data.unpause_img
     step_img: pg.surface.Surface = game_data.step_img
@@ -264,23 +266,11 @@ async def game() -> Scene:
                 if pause_rect.collidepoint(event.pos):
                     time_since_last_step_ms = 0
                     if current_mode == Mode.NOSTEP:
-                        should_change: bool = True
-                        simulation_grid = input_grid.copy()
-                        for rule in rules:
-                            for option in rule.options:
-                                if option is None:
-                                    should_change = False
-                                    break
-                            
-                            if not should_change:
-                                break
-
-                        if not should_change:
+                        if not can_unpause:
                             continue
-
                         current_mode = Mode.NORMAL
+                        simulation_grid.grid = input_grid.grid.copy()
                         continue
-
                     if current_mode == Mode.FROZEN:
                         current_mode = Mode.NORMAL
                         continue
@@ -374,8 +364,23 @@ async def game() -> Scene:
                     input_grid[x, y] = color_options[selected_color_i]
 
         if current_mode == Mode.NOSTEP:
+            can_unpause = True
+            for rule in rules:
+                for option in rule.options:
+                    if option is None:
+                        can_unpause = False
+                        break
+                
+                if not can_unpause:
+                    break
+
+        if current_mode == Mode.NOSTEP:
             input_grid.draw(screen)
             screen.blit(unpause_img, pause_rect)
+            if not can_unpause:
+                pixel: pg.Surface = pg.Surface(pause_rect.size, flags=pg.SRCALPHA)
+                pixel.fill(game_data.grey_out_color)
+                screen.blit(pixel, pause_rect, special_flags=pg.BLEND_RGB_MULT)
         else:
             simulation_grid.draw(screen)
             if current_mode == Mode.FROZEN:
