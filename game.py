@@ -331,9 +331,6 @@ async def game() -> Scene:
                         continue
 
                     matched = True
-                    if i==selected_color_i:
-                        selected_color_i = -1
-                        continue
 
                     selected_color_i = i
                     break
