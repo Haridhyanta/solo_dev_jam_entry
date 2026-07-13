@@ -1,21 +1,21 @@
 {
-    "name": "Level 8: Escort and Spread",
+    "name": "Level 8: Escort",
     "solution": [
-        "000RPRPPP",
-        "000RPRPPP",
-        "000RPRPPP",
-        "000RPRPPP",
-        "000RPRPPP",
-        "000RPRPPP",
-        "000RPRPPP",
-        "000RPRPPP",
-        "000RPRPPP"
+        "000RPR000",
+        "000RPR000",
+        "000RPR000",
+        "000RPR000",
+        "000RPR000",
+        "000RPR000",
+        "000RPR000",
+        "000RPR000",
+        "000RPR000"
     ],
     "color_options": ["R", "P", "Y"],
     "color_no_left": [2, 1, 1],
-    "rules": ["S March", "N-E Spread", "Replace", "S March", "S-E Replace"],
+    "rules": ["S March", "S March", "Replace", "Replace"],
     "locked_options": {
-        "4": {
+        "3": {
             "0": "0",
             "1": "P"
         }

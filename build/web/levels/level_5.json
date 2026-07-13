@@ -1,17 +1,17 @@
 {
-    "name": "Level 5: Fight",
+    "name": "Level 5: March",
     "solution": [
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR"
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR"
     ],
     "color_options": ["B", "R"],
     "color_no_left": [1, 1],
-    "rules": ["S-E Spread", "S-W Spread"],
+    "rules": ["Replace", "S March", "E March"],
     "locked_options": {}
 }
