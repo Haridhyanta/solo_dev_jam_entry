@@ -1,0 +1,17 @@
+{
+    "name": "Level 7: Order Matters!",
+    "solution": [
+        "RRRRRRRR",
+        "R000000R",
+        "R000000R",
+        "R000000R",
+        "R000000R",
+        "R000000R",
+        "R000000R",
+        "RRRRRRRR"
+    ],
+    "color_options": ["Y", "P", "R"],
+    "color_no_left": [2, 2, 1],
+    "rules": ["Replace", "E March", "Replace", "S March", "Replace"],
+    "locked_options": {}
+}
