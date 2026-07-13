@@ -50,6 +50,10 @@ class GameData(metaclass=Singleton):
         self.home_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/home.png'), 3.0)
         self.homepage_img: pg.surface.Surface = pg.image.load('./img/homepage.png')
         self.background_img: pg.surface.Surface = pg.image.load('./img/background.png')
+        self.tutorial_prompt_1: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/tutorial_prompt_1.png'), 2)
+        self.tutorial_prompt_2: pg.surface.Surface = pg.image.load('./img/tutorial_prompt_2.png')
+        self.tutorial_prompt_3: pg.surface.Surface = pg.image.load('./img/tutorial_prompt_3.png')
+        self.tutorial_prompt_4: pg.surface.Surface = pg.image.load('./img/tutorial_prompt_4.png')
 
         self.text_color: pg.Color = pg.Color(0, 0, 0)
         self.text_outline_color: pg.Color = pg.Color("WHITE")

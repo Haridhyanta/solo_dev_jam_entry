@@ -525,5 +525,25 @@ async def game() -> Scene:
             screen.blit(next_level_img, next_level_rect)
 
             screen.blit(winning_home_img, winning_home_rect)
+        
+        # Tutorial prompts
+        if LEVEL_NO == 1:
+            if selected_color_i < 0:
+                tutorial_prompt_rect: pg.Rect = game_data.tutorial_prompt_1.get_rect()
+                tutorial_prompt_rect.midright = color_option_rects[0].midleft
+                screen.blit(game_data.tutorial_prompt_1, tutorial_prompt_rect)
+            elif not any([any([color != Color.BLACK for color in row]) for row in input_grid.grid]):
+                tutorial_prompt_rect: pg.Rect = game_data.tutorial_prompt_2.get_rect()
+                tutorial_prompt_rect.midleft = input_grid.get_rect((0, 0)).midright
+                screen.blit(game_data.tutorial_prompt_2, tutorial_prompt_rect)
+            elif rules[0].options[0] is None:
+                tutorial_prompt_rect: pg.Rect = game_data.tutorial_prompt_3.get_rect()
+                tutorial_prompt_rect.midright = rules[0].option_rects[0].midleft
+                screen.blit(game_data.tutorial_prompt_3, tutorial_prompt_rect)
+            elif current_mode == Mode.NOSTEP:
+                tutorial_prompt_rect: pg.Rect = game_data.tutorial_prompt_4.get_rect()
+                tutorial_prompt_rect.midtop = pause_rect.midbottom
+                screen.blit(game_data.tutorial_prompt_4, tutorial_prompt_rect)
+
         pg.display.update()
         await asyncio.sleep(0)
