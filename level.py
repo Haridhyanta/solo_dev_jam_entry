@@ -73,7 +73,7 @@ async def level() -> Scene:
                     if not level_rect.collidepoint(event.pos):
                         continue
 
-                    if i+1 > game_data.level_no:
+                    if i+1 > game_data.max_level_no:
                         continue
 
                     game_data.level_no = i+1
@@ -94,7 +94,7 @@ async def level() -> Scene:
 
             pg.draw.rect(
                 screen,
-                LEVEL_DONE_COLOR if i+1 < game_data.level_no else LEVEL_LEFT_COLOR,
+                LEVEL_DONE_COLOR if i+1 < game_data.max_level_no else LEVEL_LEFT_COLOR,
                 level_rect,
                 border_radius=2
             )
@@ -107,7 +107,7 @@ async def level() -> Scene:
                 LEVEL_BORDER_R
             )
 
-            if i+1>=game_data.level_no+1:
+            if i+1>=game_data.max_level_no+1:
                 padlock_rect: pg.Rect = padlock_img.get_rect()
                 padlock_rect.center = level_no_rect.center
                 screen.blit(padlock_img, padlock_rect)

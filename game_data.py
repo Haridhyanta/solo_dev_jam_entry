@@ -25,6 +25,7 @@ class GameData(metaclass=Singleton):
         self.bg_color: tuple[int, int, int] = 0, 0, 0
 
         self.level_no: int = 1
+        self.max_level_no: int = 1
         self.total_no_of_levels: int = 1
         while True:
             if not os.path.exists(f'./levels/level_{self.total_no_of_levels+1}.json'):

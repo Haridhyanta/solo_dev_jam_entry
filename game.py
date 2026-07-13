@@ -271,6 +271,7 @@ async def game() -> Scene:
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 if has_won:
+                    game_data.max_level_no = max(LEVEL_NO+1, game_data.max_level_no)
                     if next_level_rect.collidepoint(event.pos):
                         game_data.level_no += 1
                         if game_data.level_no > game_data.total_no_of_levels:
