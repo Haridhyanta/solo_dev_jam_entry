@@ -7,7 +7,7 @@ from game_data import GameData
 import pygame as pg
 from grid import ColorGrid
 from load_level import LevelInfo, load_level
-from rule import DRSpread, Rule
+from rule import SESpread, Rule
 from scenes import Scene
 
 
@@ -288,7 +288,7 @@ async def game() -> Scene:
                         if not can_unpause:
                             continue
                         current_mode = Mode.NORMAL
-                        simulation_grid.grid = input_grid.grid.copy()
+                        simulation_grid= input_grid.copy()
                         continue
                     if current_mode == Mode.FROZEN:
                         current_mode = Mode.NORMAL
