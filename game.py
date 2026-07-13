@@ -142,6 +142,7 @@ async def game() -> Scene:
     pause_img: pg.surface.Surface = game_data.pause_img
     unpause_img: pg.surface.Surface = game_data.unpause_img
     step_img: pg.surface.Surface = game_data.step_img
+    reset_img: pg.surface.Surface = game_data.reset_img
 
     DIST_BTW_PAUSE_IMG_AND_EDGE: int = WIND_Y // 25
     DIST_BTW_ICONS: int = WIND_Y//30
@@ -152,6 +153,10 @@ async def game() -> Scene:
     step_rect: pg.Rect = step_img.get_rect()
     step_rect.center = pause_rect.center
     step_rect.right = pause_rect.left - DIST_BTW_ICONS
+    
+    reset_rect: pg.Rect = reset_img.get_rect()
+    reset_rect.center= step_rect.center
+    reset_rect.right = step_rect.left - DIST_BTW_ICONS
     
     winning_screen_bg_rect = pg.Rect(0, 0, (WIND_X*3)//5, (WIND_Y*3)//5)
     winning_screen_bg_rect.center = WIND_X//2, WIND_Y//2
@@ -293,6 +298,10 @@ async def game() -> Scene:
                         if step_from_i >= len(rules):
                             step_from_i = 0
                         has_won = has_won or simulation_grid.grid == solution_grid.grid
+
+                    if reset_rect.collidepoint(event.pos):
+                        time_since_last_step_ms = 0
+                        current_mode = Mode.NOSTEP
 
                     continue
 
@@ -467,17 +476,19 @@ async def game() -> Scene:
         screen.blit(outline_sprite, outline_rect)
         screen.blit(level_text_sprite, level_text_rect)
 
-        # step option
+        # step and reset option
         screen.blit(step_img, step_rect)
+        screen.blit(reset_img, reset_rect)
         if current_mode != Mode.FROZEN:
             pixel: pg.Surface = pg.Surface(step_rect.size, flags=pg.SRCALPHA)
             pixel.fill(game_data.grey_out_color)
             screen.blit(pixel, step_rect, special_flags=pg.BLEND_RGB_MULT)
+            screen.blit(pixel, reset_rect, special_flags=pg.BLEND_RGB_MULT)
 
-        await asyncio.sleep(0)
         if has_won:
             pg.draw.rect(screen, WINNING_BG_RECT_COLOR, winning_screen_bg_rect, border_radius=WINNING_BG_RECT_R)
             screen.blit(winning_text_sprite, winning_text_rect)
 
             screen.blit(next_level_img, next_level_rect)
         pg.display.update()
+        await asyncio.sleep(0)
