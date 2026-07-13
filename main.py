@@ -8,11 +8,13 @@ from level import level
 from scenes import Scene
 from game_data import GameData
 from scenes import Scene
+from thanks import thanks
 
 scenes_to_func: dict[Scene, Callable[[], Coroutine[Any, Any, Scene]]] = {
     Scene.HOME: home,
     Scene.GAME: game,
     Scene.LEVEL: level,
+    Scene.THANKS: thanks,
 }
 
 GameData()

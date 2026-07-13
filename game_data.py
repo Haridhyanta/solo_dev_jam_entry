@@ -38,6 +38,7 @@ class GameData(metaclass=Singleton):
         self.small_font = pg.font.Font(self.normal_font_path, 12)
         self.large_font = pg.font.Font(self.normal_font_path, 64)
         self.ui_large_font = pg.font.Font(self.normal_font_path, 200)
+        self.ui_max_font = pg.font.Font(self.normal_font_path, 300)
         self.bold_font_path = r'./Roboto_Mono/static/RobotoMono-SemiBold.ttf'
         self.bold_font = pg.font.Font(self.bold_font_path, 28)
 

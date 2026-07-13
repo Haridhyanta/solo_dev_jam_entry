@@ -273,6 +273,8 @@ async def game() -> Scene:
                 if has_won:
                     if next_level_rect.collidepoint(event.pos):
                         game_data.level_no += 1
+                        if game_data.level_no > game_data.total_no_of_levels:
+                            return Scene.THANKS
                         return Scene.GAME
 
                     if winning_home_rect.collidepoint(event.pos):

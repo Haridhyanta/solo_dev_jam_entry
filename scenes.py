@@ -6,3 +6,4 @@ class Scene(enum.Enum):
     GAME = enum.auto()
     QUIT = enum.auto()
     LEVEL = enum.auto()
+    THANKS = enum.auto()
