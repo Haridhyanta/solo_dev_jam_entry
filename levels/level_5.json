@@ -1,5 +1,5 @@
 {
-    "name": "Level 5: Locked",
+    "name": "Level 5: Fight",
     "solution": [
         "BBBBRRRR",
         "BBBBRRRR",
@@ -10,12 +10,8 @@
         "BBBBRRRR",
         "BBBBRRRR"
     ],
-    "color_options": ["B", "R", "P"],
-    "color_no_left": [1, 1, 1],
-    "rules": ["S-E Spread", "S-W Cover", "N-E Replace"],
-    "locked_options": {
-        "1": {
-            "0": "P"
-        }
-    }
+    "color_options": ["B", "R"],
+    "color_no_left": [1, 1],
+    "rules": ["S-E Spread", "S-W Spread"],
+    "locked_options": {}
 }

@@ -1,17 +1,21 @@
 {
-    "name": "Level 4: Fight",
+    "name": "Level 4: Replace",
     "solution": [
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR"
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR"
     ],
     "color_options": ["B", "R"],
     "color_no_left": [1, 1],
-    "rules": ["S-E Spread", "S-W Spread"],
-    "locked_options": {}
+    "rules": ["Replace", "S-W Cover"],
+    "locked_options": {
+        "1": {
+            "0": "B"
+        }
+    }
 }

@@ -86,7 +86,7 @@ async def game() -> Scene:
         0, 
         0,
         WIND_X // 8,
-        (WIND_Y * 14) // 30,
+        (WIND_Y * 17) // 30,
     )
 
     current_rule_rect.bottom = WIND_Y-DIST_BTW_RULES_AND_EDGE
@@ -132,13 +132,13 @@ async def game() -> Scene:
 
     COLOR_OPTION_BORDER_DEFAULT_COLOR: pg.Color = pg.Color((250, 95, 28))
     COLOR_OPTION_BORDER_SELECTED_COLOR: pg.Color = pg.Color("White")
-    COLOR_OPTION_BORDER_W: int = 5
-    COLOR_OPTION_BORDER_R: int = 2
+    COLOR_OPTION_BORDER_W: int = 25
+    COLOR_OPTION_BORDER_R: int = 10
 
-    COLOR_OPTION_SIZE: tuple[int, int] = WIND_Y//10, WIND_Y//10
+    COLOR_OPTION_SIZE: tuple[int, int] = WIND_Y//7, WIND_Y//7
     DIST_BTW_COLOR_OPTION_AND_EDGE: int = DIST_BTW_RULES_AND_EDGE
     DIST_BTW_COLOR_OPTIONS: int = DIST_BTW_RULES
-    DIST_BTW_COLOR_OPTION_AND_RULES: int = WIND_Y//15
+    DIST_BTW_COLOR_OPTION_AND_RULES: int = WIND_Y//35
 
     current_option_rect: pg.Rect = pg.Rect((0, 0), COLOR_OPTION_SIZE)
     current_option_rect.right = WIND_X - DIST_BTW_COLOR_OPTION_AND_EDGE
@@ -287,10 +287,12 @@ async def game() -> Scene:
                     if current_mode == Mode.NOSTEP:
                         if not can_unpause:
                             continue
+                        selected_color_i = -1
                         current_mode = Mode.NORMAL
                         simulation_grid= input_grid.copy()
                         continue
                     if current_mode == Mode.FROZEN:
+                        selected_color_i = -1
                         current_mode = Mode.NORMAL
                         continue
 
@@ -420,7 +422,11 @@ async def game() -> Scene:
             time_since_last_step_ms = 0
 
         for i, rule in enumerate(rules):
-            rule.draw(screen)
+            rule.draw(
+                screen,
+                selected_color_i>=0,
+                COLOR_OPTION_BORDER_DEFAULT_COLOR,
+            )
             if should_step and i==step_from_i:
                 rule.step(simulation_grid)
 
@@ -522,7 +528,7 @@ async def game() -> Scene:
         
         # Tutorial prompts
         if LEVEL_NO == 1:
-            if selected_color_i < 0:
+            if selected_color_i < 0 and current_mode == Mode.NOSTEP:
                 tutorial_prompt_rect: pg.Rect = game_data.tutorial_prompt_1.get_rect()
                 tutorial_prompt_rect.midright = color_option_rects[0].midleft
                 screen.blit(game_data.tutorial_prompt_1, tutorial_prompt_rect)

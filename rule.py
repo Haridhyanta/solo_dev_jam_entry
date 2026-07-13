@@ -20,6 +20,7 @@ class Rule:
             bg_rect: pg.Rect,
             bg_color: pg.Color,
             option_size: tuple[int, int],
+            dist_btw_option_and_text: int=15
         ) -> None:
 
         self.name: str = name
@@ -55,19 +56,25 @@ class Rule:
         for i in range(0, 2*len(text)-1):
             if i%2 == 1:
                 index = (i-1)//2
-                self.option_rects[index].top = last_rect.bottom
+                self.option_rects[index].top = last_rect.bottom + dist_btw_option_and_text
                 self.option_rects[index].centerx = bg_rect.centerx
                 last_rect = self.option_rects[index]
             else:
                 index = i//2
-                self.text_sprite_rects[index].top = last_rect.bottom
+                self.text_sprite_rects[index].top = last_rect.bottom + dist_btw_option_and_text
                 self.text_sprite_rects[index].left = bg_rect.left
                 last_rect = self.text_sprite_rects[index]
 
     def step(self, grid: ColorGrid) -> None:
         raise NotImplementedError()
     
-    def draw(self, screen: pg.surface.Surface) -> None:
+    def draw(
+            self, 
+            screen: pg.surface.Surface,
+            draw_border: bool=False,
+            border_color: pg.Color=pg.Color(250, 95, 28),
+            border_w: int=15
+        ) -> None:
         pg.draw.rect(
             screen,
             self.bg_color,
@@ -87,6 +94,13 @@ class Rule:
 
         for option_rect, option_color in zip(self.option_rects, self.options):
             if option_color is None:
+                if draw_border:
+                    pg.draw.rect(
+                        screen,
+                        border_color,
+                        option_rect.inflate(2*border_w, 2*border_w),
+                    )
+
                 pg.draw.rect(
                     screen,
                     pg.Color("Black"),
