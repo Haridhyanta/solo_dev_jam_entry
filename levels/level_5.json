@@ -1,23 +1,21 @@
 {
-    "name": "Level 5: Escort",
+    "name": "Level 5: Locked",
     "solution": [
-        "000RPR000",
-        "000RPR000",
-        "000RPR000",
-        "000RPR000",
-        "000RPR000",
-        "000RPR000",
-        "000RPR000",
-        "000RPR000",
-        "000RPR000"
+        "BBBBRRRR",
+        "BBBBRRRR",
+        "BBBBRRRR",
+        "BBBBRRRR",
+        "BBBBRRRR",
+        "BBBBRRRR",
+        "BBBBRRRR",
+        "BBBBRRRR"
     ],
-    "color_options": ["R", "P", "Y"],
-    "color_no_left": [2, 1, 1],
-    "rules": ["S March", "S March", "Replace", "Replace"],
+    "color_options": ["B", "R", "P"],
+    "color_no_left": [1, 1, 1],
+    "rules": ["S-E Spread", "S-W Cover", "N-E Replace"],
     "locked_options": {
-        "3": {
-            "0": "0",
-            "1": "P"
+        "1": {
+            "0": "P"
         }
     }
 }
