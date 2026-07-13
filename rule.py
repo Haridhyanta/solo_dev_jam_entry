@@ -42,7 +42,13 @@ class Rule:
         self.option_rects: list[pg.Rect] = [pg.Rect((0, 0), option_size) for _ in range(self.no_of_options)]
         self.options: list[Color|None] = [None] * self.no_of_options
 
-        self.name_sprite: pg.surface.Surface = name_font.render(name, True, name_color)
+        self.name_sprite: pg.surface.Surface = text_wrap_mono(
+            name_font,
+            name,
+            self.bg_rect.w * 8 // 10,
+            name_color,
+            center_text=True
+        )
         self.name_sprite_rect: pg.Rect = self.name_sprite.get_rect()
         self.name_sprite_rect.midtop = bg_rect.midtop
 
@@ -146,7 +152,7 @@ class NESpread(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "N-E Spread"
+        name: str = "Up Right Spread"
         text: list[str] = ["The color", "spreads to the squares above and to the right of it."]
         super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
 
@@ -181,7 +187,7 @@ class SESpread(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "S-E Spread"
+        name: str = "Down Right Spread"
         text: list[str] = ["The color", "spreads to the squares below and to the right of it."]
         super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
 
@@ -216,7 +222,7 @@ class SWSpread(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "S-W Spread"
+        name: str = "Down Left Spread"
         text: list[str] = ["The color", "spreads to the squares below and to the left of it."]
         super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
 
@@ -251,7 +257,7 @@ class NWSpread(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "N-W Spread"
+        name: str = "Up Left Spread"
         text: list[str] = ["The color", "spreads to the squares above and to the right of it."]
         super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
 
@@ -286,7 +292,7 @@ class NECover(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "N-E Cover"
+        name: str = "Up Right Cover"
         text: list[str] = [
             "The color",
             "spreads to the squares above and to the right of it unless the squares are of color",
@@ -328,7 +334,7 @@ class SECover(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "S-E Cover"
+        name: str = "Down Right Cover"
         text: list[str] = [
             "The color",
             "spreads to the squares below and to the right of it unless the squares are of color",
@@ -370,7 +376,7 @@ class SWCover(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "S-W Cover"
+        name: str = "Down Left Cover"
         text: list[str] = [
             "The color",
             "spreads to the squares below and to the left of it unless the squares are of color",
@@ -412,7 +418,7 @@ class NWCover(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "N-W Cover"
+        name: str = "Up Left Cover"
         text: list[str] = [
             "The color",
             "spreads to the squares above and to the left of it unless the squares are of color",
@@ -454,7 +460,7 @@ class NEReplace(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "N-E Replace"
+        name: str = "Up Right Replace"
         text: list[str] = [
             "The color",
             "spreads to the squares above and to the right of it if the squares are of color",
@@ -497,7 +503,7 @@ class SEReplace(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "S-E Replace"
+        name: str = "Down Right Replace"
         text: list[str] = [
             "The color",
             "spreads to the squares below and to the right of it if the squares are of color",
@@ -539,7 +545,7 @@ class SWReplace(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "S-W Replace"
+        name: str = "Down Left Replace"
         text: list[str] = [
             "The color",
             "spreads to the squares below and to the left of it if the squares are of color",
@@ -581,7 +587,7 @@ class NWReplace(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "N-W Replace"
+        name: str = "Up Left Replace"
         text: list[str] = [
             "The color",
             "spreads to the squares above and to the left of it if the squares are of color",
@@ -671,7 +677,7 @@ class NMarch(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "N March"
+        name: str = "Up March"
         text: list[str] = ["The color", "spreads to the square directly above it."]
         super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
 
@@ -703,7 +709,7 @@ class EMarch(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "E March"
+        name: str = "Right March"
         text: list[str] = ["The color", "spreads to the square directly to the right of it."]
         super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
 
@@ -735,7 +741,7 @@ class SMarch(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "S March"
+        name: str = "Down March"
         text: list[str] = ["The color", "spreads to the square directly below it."]
         super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
 
@@ -767,7 +773,7 @@ class WMarch(Rule):
             bg_color: pg.Color,
             option_size: tuple[int, int],
         ) -> None:
-        name: str = "W March"
+        name: str = "Left March"
         text: list[str] = ["The color", "spreads to the square directly to the left of it."]
         super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
 

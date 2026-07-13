@@ -90,7 +90,7 @@ async def game() -> Scene:
     current_rule_rect: pg.Rect = pg.Rect(
         0, 
         0,
-        WIND_X // 8,
+        (WIND_X * 13) // 100,
         (WIND_Y * 17) // 30,
     )
 

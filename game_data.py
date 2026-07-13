@@ -39,7 +39,7 @@ class GameData(metaclass=Singleton):
         self.large_font = pg.font.Font(self.normal_font_path, 64)
         self.ui_large_font = pg.font.Font(self.normal_font_path, 200)
         self.bold_font_path = r'./Roboto_Mono/static/RobotoMono-SemiBold.ttf'
-        self.bold_font = pg.font.Font(self.bold_font_path, 32)
+        self.bold_font = pg.font.Font(self.bold_font_path, 28)
 
         self.padlock_img: pg.surface.Surface = pg.transform.scale(pg.image.load('./img/padlock.png'), (50, 50))
         self.next_level_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/next_level.png'), 4.0)
