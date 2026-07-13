@@ -305,6 +305,7 @@ async def game() -> Scene:
                 if current_mode != Mode.NOSTEP:
                     if reset_rect.collidepoint(event.pos):
                         time_since_last_step_ms = 0
+                        step_from_i = 0
                         current_mode = Mode.NOSTEP
 
                     if current_mode != Mode.FROZEN:
