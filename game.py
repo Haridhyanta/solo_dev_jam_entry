@@ -29,7 +29,6 @@ async def game() -> Scene:
     dt: int = 0
 
     LEVEL_NO: int = game_data.level_no
-    print(f'{LEVEL_NO = }')
 
     LEVEL_INFO: LevelInfo = load_level(LEVEL_NO)
 
@@ -139,6 +138,20 @@ async def game() -> Scene:
     for _ in color_options:
         color_option_rects.append(current_option_rect.copy())
         current_option_rect.right = current_option_rect.left - DIST_BTW_COLOR_OPTIONS
+
+    pause_img: pg.surface.Surface = game_data.pause_img
+    unpause_img: pg.surface.Surface = game_data.unpause_img
+    step_img: pg.surface.Surface = game_data.step_img
+
+    DIST_BTW_PAUSE_IMG_AND_EDGE: int = WIND_Y // 25
+    DIST_BTW_ICONS: int = WIND_Y//30
+    pause_rect: pg.Rect = pause_img.get_rect()
+    pause_rect.right = WIND_X - DIST_BTW_PAUSE_IMG_AND_EDGE
+    pause_rect.top = DIST_BTW_PAUSE_IMG_AND_EDGE
+
+    step_rect: pg.Rect = step_img.get_rect()
+    step_rect.center = pause_rect.center
+    step_rect.right = pause_rect.left - DIST_BTW_ICONS
     
     winning_screen_bg_rect = pg.Rect(0, 0, (WIND_X*3)//5, (WIND_Y*3)//5)
     winning_screen_bg_rect.center = WIND_X//2, WIND_Y//2
@@ -162,10 +175,11 @@ async def game() -> Scene:
 
     has_won: bool = False
 
-    TIME_BTW_STEPS_MS: int = 500
-    TIME_BTW_STEPS_MS_FAST_MODE: int = 200
+    TIME_BTW_STEPS_MS: int = 100
+    TIME_BTW_STEPS_MS_FAST_MODE: int = 10
     
     time_since_last_step_ms = 0
+    step_from_i: int = 0
 
     current_mode: Mode = Mode.NOSTEP
 
@@ -182,6 +196,10 @@ async def game() -> Scene:
                 if event.key == pg.K_RETURN:
                     game_data.level_no += 1
                     return Scene.GAME
+                
+                if has_won:
+                    continue
+
                 if event.key == pg.K_r:
                     time_since_last_step_ms = 0
                     current_mode = Mode.NOSTEP
@@ -190,8 +208,10 @@ async def game() -> Scene:
                     if current_mode != Mode.FROZEN:
                         continue
                     time_since_last_step_ms = 0
-                    for rule in rules:
-                        rule.step(simulation_grid)
+                    rules[step_from_i].step(simulation_grid)
+                    step_from_i += 1
+                    if step_from_i >= len(rules):
+                        step_from_i = 0
                     has_won = has_won or simulation_grid.grid == solution_grid.grid
 
                 if event.key == pg.K_k:
@@ -236,7 +256,44 @@ async def game() -> Scene:
                     game_data.level_no += 1
                     return Scene.GAME
 
+                if pause_rect.collidepoint(event.pos):
+                    time_since_last_step_ms = 0
+                    if current_mode == Mode.NOSTEP:
+                        should_change: bool = True
+                        simulation_grid = input_grid.copy()
+                        for rule in rules:
+                            for option in rule.options:
+                                if option is None:
+                                    should_change = False
+                                    break
+                            
+                            if not should_change:
+                                break
+
+                        if not should_change:
+                            continue
+
+                        current_mode = Mode.NORMAL
+                        continue
+
+                    if current_mode == Mode.FROZEN:
+                        current_mode = Mode.NORMAL
+                        continue
+
+                    current_mode = Mode.FROZEN
+                    continue
+
                 if current_mode != Mode.NOSTEP:
+                    if current_mode != Mode.FROZEN:
+                        continue
+                    if step_rect.collidepoint(event.pos):
+                        time_since_last_step_ms = 0
+                        rules[step_from_i].step(simulation_grid)
+                        step_from_i += 1
+                        if step_from_i >= len(rules):
+                            step_from_i = 0
+                        has_won = has_won or simulation_grid.grid == solution_grid.grid
+
                     continue
 
                 if event.button != 1:
@@ -244,6 +301,7 @@ async def game() -> Scene:
 
                 mouse_pos: tuple[int, int] = event.pos
                 matched: bool = False
+
                 for i, option_rect in enumerate(color_option_rects):
                     if not option_rect.collidepoint(mouse_pos):
                         continue
@@ -308,8 +366,13 @@ async def game() -> Scene:
 
         if current_mode == Mode.NOSTEP:
             input_grid.draw(screen)
+            screen.blit(unpause_img, pause_rect)
         else:
             simulation_grid.draw(screen)
+            if current_mode == Mode.FROZEN:
+                screen.blit(unpause_img, pause_rect)
+            else:
+                screen.blit(pause_img, pause_rect)
         solution_grid.draw(screen)
 
         should_step: bool = False
@@ -322,9 +385,9 @@ async def game() -> Scene:
             time_since_last_step_ms = 0
 
         for i, rule in enumerate(rules):
-            if should_step:
-                rule.step(simulation_grid)
             rule.draw(screen)
+            if should_step and i==step_from_i:
+                rule.step(simulation_grid)
 
             if i in LEVEL_INFO.locked_options:
                 for locked_option_i in LEVEL_INFO.locked_options[i]:
@@ -334,12 +397,15 @@ async def game() -> Scene:
 
                     screen.blit(game_data.padlock_img, padlock_rect)
 
-            if current_mode != Mode.NOSTEP:
+            if current_mode != Mode.NOSTEP and i != step_from_i:
                 pixel: pg.Surface = pg.Surface(rule.bg_rect.size, flags=pg.SRCALPHA)
                 pixel.fill(game_data.grey_out_color)
                 screen.blit(pixel, rule.bg_rect, special_flags=pg.BLEND_RGB_MULT)
 
         if should_step and not has_won:
+            step_from_i += 1
+            if step_from_i >= len(rules):
+                step_from_i = 0
             has_won = simulation_grid.grid == solution_grid.grid
 
         for i, (color_value, no_left, option_rect) in enumerate(zip(color_options, color_no_left, color_option_rects)):
@@ -400,6 +466,14 @@ async def game() -> Scene:
 
         screen.blit(outline_sprite, outline_rect)
         screen.blit(level_text_sprite, level_text_rect)
+
+        # step option
+        screen.blit(step_img, step_rect)
+        if current_mode != Mode.FROZEN:
+            pixel: pg.Surface = pg.Surface(step_rect.size, flags=pg.SRCALPHA)
+            pixel.fill(game_data.grey_out_color)
+            screen.blit(pixel, step_rect, special_flags=pg.BLEND_RGB_MULT)
+
         await asyncio.sleep(0)
         if has_won:
             pg.draw.rect(screen, WINNING_BG_RECT_COLOR, winning_screen_bg_rect, border_radius=WINNING_BG_RECT_R)

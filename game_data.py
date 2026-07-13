@@ -37,6 +37,9 @@ class GameData(metaclass=Singleton):
 
         self.padlock_img: pg.surface.Surface = pg.transform.scale(pg.image.load('./img/padlock.png'), (50, 50))
         self.next_level_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/next_level.png'), 4.0)
+        self.pause_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/pause.png'), 4.0)
+        self.unpause_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/unpause.png'), 4.0)
+        self.step_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/step.png'), 4.0)
 
         self.text_color: pg.Color = pg.Color(0, 0, 0)
         self.text_outline_color: pg.Color = pg.Color("WHITE")
