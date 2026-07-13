@@ -1,4 +1,5 @@
 import asyncio
+from math import ceil
 
 from game_data import GameData
 import pygame as pg
@@ -22,16 +23,20 @@ async def level() -> Scene:
     DIST_BTW_LEVEL_RECT_AND_BG: int = WIND_Y // 25
     DIST_BTW_LEVELS: int = WIND_Y // 30
 
-    NO_OF_LEVELS_PER_LINE: int = 6
+    NO_OF_LINES: int = 2
+    NO_OF_LEVELS_PER_LINE: int = ceil(game_data.total_no_of_levels/NO_OF_LINES)
 
-    LEVEL_W: int = (levels_bg_rect.w - (2*DIST_BTW_LEVEL_RECT_AND_BG + (NO_OF_LEVELS_PER_LINE-1)*DIST_BTW_LEVELS))//NO_OF_LEVELS_PER_LINE
-    LEVEL_H: int = LEVEL_W
+    LEVEL_H: int = (levels_bg_rect.h - (2*DIST_BTW_LEVEL_RECT_AND_BG + (NO_OF_LINES-1)*DIST_BTW_LEVELS))//NO_OF_LINES
+    LEVEL_W: int = LEVEL_H
+
+    levels_bg_rect.w = (LEVEL_W*NO_OF_LEVELS_PER_LINE) + (DIST_BTW_LEVEL_RECT_AND_BG*2) + (DIST_BTW_LEVELS*(NO_OF_LEVELS_PER_LINE-1))
+    levels_bg_rect.centerx = WIND_X//2
 
     LEVEL_DONE_COLOR: pg.Color = pg.Color("Green")
     LEVEL_BORDER_COLOR: pg.Color = pg.Color((216, 90, 26))
 
-    LEVEL_BORDER_W: int = 10
-    LEVEL_BORDER_R: int = 5
+    LEVEL_BORDER_W: int = 20
+    LEVEL_BORDER_R: int = 10
 
     LEVEL_NO_FONT: pg.font.Font = game_data.ui_large_font
     LEVEL_NO_COLOR: pg.Color = game_data.text_color
