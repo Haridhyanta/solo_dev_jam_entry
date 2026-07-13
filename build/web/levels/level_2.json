@@ -1,17 +1,17 @@
 {
     "name": "Level 2: Cover",
     "solution": [
-        "BBBBBBBB",
-        "BBBBBBBB",
-        "BBRRRRRR",
-        "BBRRRRRR",
-        "BBRRRRRR",
-        "BBRRRRRR",
-        "BBRRRRRR",
-        "BBRRRRRR"
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRR",
+        "RRRRRRRB"
     ],
     "color_options": ["B", "R"],
     "color_no_left": [1, 1],
-    "rules": ["S-E Spread", "S-E Cover"],
+    "rules": ["S-E Cover"],
     "locked_options": {}
 }
