@@ -32,6 +32,7 @@ async def level() -> Scene:
     levels_bg_rect.w = (LEVEL_W*NO_OF_LEVELS_PER_LINE) + (DIST_BTW_LEVEL_RECT_AND_BG*2) + (DIST_BTW_LEVELS*(NO_OF_LEVELS_PER_LINE-1))
     levels_bg_rect.centerx = WIND_X//2
 
+    LEVEL_LEFT_COLOR: pg.Color = pg.Color("Red")
     LEVEL_DONE_COLOR: pg.Color = pg.Color("Green")
     LEVEL_BORDER_COLOR: pg.Color = pg.Color((216, 90, 26))
 
@@ -49,6 +50,8 @@ async def level() -> Scene:
         y = levels_bg_rect.y + (i//NO_OF_LEVELS_PER_LINE) * (LEVEL_H+DIST_BTW_LEVELS) + DIST_BTW_LEVEL_RECT_AND_BG
         level_rects.append(pg.Rect(x, y, LEVEL_W, LEVEL_H))
         level_no_sprites.append(LEVEL_NO_FONT.render(f'{i+1}', True, LEVEL_NO_COLOR))
+
+    padlock_img = pg.transform.scale(game_data.padlock_img, (LEVEL_W, LEVEL_H))
 
     clock: pg.time.Clock = game_data.clock
     max_fps: float = game_data.max_fps
@@ -70,6 +73,9 @@ async def level() -> Scene:
                     if not level_rect.collidepoint(event.pos):
                         continue
 
+                    if i+1 > game_data.level_no:
+                        continue
+
                     game_data.level_no = i+1
                     return Scene.GAME
             
@@ -82,13 +88,13 @@ async def level() -> Scene:
             border_radius=2
         )
 
-        for level_rect, level_no_sprite in zip(level_rects, level_no_sprites):
+        for i, (level_rect, level_no_sprite) in enumerate(zip(level_rects, level_no_sprites)):
             level_no_rect: pg.Rect = level_no_sprite.get_rect()
             level_no_rect.center = level_rect.center
 
             pg.draw.rect(
                 screen,
-                LEVEL_DONE_COLOR,
+                LEVEL_DONE_COLOR if i+1 < game_data.level_no else LEVEL_LEFT_COLOR,
                 level_rect,
                 border_radius=2
             )
@@ -101,7 +107,12 @@ async def level() -> Scene:
                 LEVEL_BORDER_R
             )
 
-            screen.blit(level_no_sprite, level_no_rect)
+            if i+1>=game_data.level_no+1:
+                padlock_rect: pg.Rect = padlock_img.get_rect()
+                padlock_rect.center = level_no_rect.center
+                screen.blit(padlock_img, padlock_rect)
+            else:
+                screen.blit(level_no_sprite, level_no_rect)
 
         pg.display.update()
         await asyncio.sleep(0)
