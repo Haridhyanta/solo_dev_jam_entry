@@ -414,6 +414,8 @@ async def game() -> Scene:
         elif current_mode == Mode.SPEDUP:
             should_step = time_since_last_step_ms >= TIME_BTW_STEPS_MS_FAST_MODE
         
+        should_step = should_step and not has_won
+
         if should_step:
             time_since_last_step_ms = 0
 
