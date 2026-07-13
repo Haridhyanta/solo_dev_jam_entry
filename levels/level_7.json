@@ -1,21 +1,17 @@
 {
-    "name": "Level 7: Locked",
+    "name": "Level 7: Lopsided Fight",
     "solution": [
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR",
-        "BBBBRRRR"
+        "BBBBBBBR",
+        "BBBBBBBR",
+        "BBBBBBBR",
+        "BBBBBBBR",
+        "BBBBBBBR",
+        "BBBBBBBR",
+        "BBBBBBBR",
+        "BBBBBBBR"
     ],
-    "color_options": ["B", "R", "P"],
-    "color_no_left": [1, 1, 1],
-    "rules": ["S-E Spread", "S-W Cover", "N-E Replace"],
-    "locked_options": {
-        "1": {
-            "0": "P"
-        }
-    }
+    "color_options": ["B", "R"],
+    "color_no_left": [1, 1],
+    "rules": ["S-E Spread", "S-W Spread", "S-E Spread"],
+    "locked_options": {}
 }

@@ -28,4 +28,4 @@ def update(file_path: str, new_level_no: int):
 
     os.remove(path=file_path)
 
-update('.\\levels\\level_4 copy.json', 5)
+update('.\\levels\\level_6 copy.json', 7)
