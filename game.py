@@ -79,6 +79,11 @@ async def game() -> Scene:
 
     solution_grid.bounding_rect.bottom = WIND_Y - PLAY_GRID_DIST_FROM_EDGE
 
+    TARGET_FONT: pg.font.Font = game_data.large_font
+    TARGET_TEXT_SPRITE: pg.surface.Surface = TARGET_FONT.render('TARGET:', True, game_data.text_color)
+    target_text_rect = TARGET_TEXT_SPRITE.get_rect()
+    target_text_rect.bottomleft = solution_grid.bounding_rect.topleft
+
     DIST_BTW_RULES_AND_EDGE: int = WIND_Y//17
     DIST_BTW_RULES: int = WIND_Y//30
 
@@ -409,6 +414,17 @@ async def game() -> Scene:
             else:
                 screen.blit(pause_img, pause_rect)
         solution_grid.draw(screen)
+
+        outline_sprite: pg.surface.Surface = COLOR_OPTION_FONT.render('TARGET:', True, game_data.text_outline_color)
+        directions: list[tuple[int, int]] = []
+        for x in range(-1, 2):
+            for y in range(-1, 2):
+                directions.append((x*COLOR_OPTION_OUTLINE_W, y*COLOR_OPTION_OUTLINE_W))
+
+        for (x_offset, y_offset) in directions:
+            screen.blit(outline_sprite, target_text_rect.move(x_offset, y_offset))
+        screen.blit(outline_sprite, target_text_rect)
+        screen.blit(TARGET_TEXT_SPRITE, target_text_rect)
 
         should_step: bool = False
         if current_mode == Mode.NORMAL:
