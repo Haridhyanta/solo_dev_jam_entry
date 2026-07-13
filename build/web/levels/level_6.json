@@ -1,23 +1,17 @@
 {
-    "name": "Level 6: Escort",
+    "name": "Level 6: Order Matters!",
     "solution": [
-        "000RPR000",
-        "000RPR000",
-        "000RPR000",
-        "000RPR000",
-        "000RPR000",
-        "000RPR000",
-        "000RPR000",
-        "000RPR000",
-        "000RPR000"
+        "RRRRRRRR",
+        "R000000R",
+        "R000000R",
+        "R000000R",
+        "R000000R",
+        "R000000R",
+        "R000000R",
+        "RRRRRRRR"
     ],
-    "color_options": ["R", "P", "Y"],
-    "color_no_left": [2, 1, 1],
-    "rules": ["S March", "S March", "Replace", "Replace"],
-    "locked_options": {
-        "3": {
-            "0": "0",
-            "1": "P"
-        }
-    }
+    "color_options": ["Y", "P", "R"],
+    "color_no_left": [2, 2, 1],
+    "rules": ["Replace", "E March", "Replace", "S March", "Replace"],
+    "locked_options": {}
 }
