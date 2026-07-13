@@ -40,6 +40,7 @@ class GameData(metaclass=Singleton):
         self.pause_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/pause.png'), 4.0)
         self.unpause_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/unpause.png'), 4.0)
         self.step_img: pg.surface.Surface = pg.transform.scale_by(pg.image.load('./img/step.png'), 4.0)
+        self.homepage_img: pg.surface.Surface = pg.image.load('./img/homepage.png')
 
         self.text_color: pg.Color = pg.Color(0, 0, 0)
         self.text_outline_color: pg.Color = pg.Color("WHITE")

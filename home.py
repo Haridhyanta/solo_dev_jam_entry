@@ -12,6 +12,8 @@ async def home() -> Scene:
     WIND_X, WIND_Y = game_data.WIND_X, game_data.WIND_Y
     bg_color: tuple[int, int, int] = game_data.bg_color
 
+    bg_img: pg.surface.Surface = game_data.homepage_img
+
     clock: pg.time.Clock = game_data.clock
     max_fps: float = game_data.max_fps
     dt: int = 0
@@ -23,6 +25,14 @@ async def home() -> Scene:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return Scene.QUIT
+
+            if event.type == pg.MOUSEBUTTONDOWN:
+                return Scene.GAME
             
+            if event.type == pg.KEYDOWN:
+                return Scene.GAME
+            
+        screen.blit(bg_img, (0, 0))
+
         pg.display.update()
         await asyncio.sleep(0)
