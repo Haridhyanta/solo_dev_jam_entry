@@ -303,8 +303,13 @@ async def game() -> Scene:
                     continue
 
                 if current_mode != Mode.NOSTEP:
+                    if reset_rect.collidepoint(event.pos):
+                        time_since_last_step_ms = 0
+                        current_mode = Mode.NOSTEP
+
                     if current_mode != Mode.FROZEN:
                         continue
+
                     if step_rect.collidepoint(event.pos):
                         time_since_last_step_ms = 0
                         rules[step_from_i].step(simulation_grid)
@@ -312,10 +317,6 @@ async def game() -> Scene:
                         if step_from_i >= len(rules):
                             step_from_i = 0
                         has_won = has_won or simulation_grid.grid == solution_grid.grid
-
-                    if reset_rect.collidepoint(event.pos):
-                        time_since_last_step_ms = 0
-                        current_mode = Mode.NOSTEP
 
                     continue
 
@@ -534,11 +535,12 @@ async def game() -> Scene:
         # step and reset option
         screen.blit(step_img, step_rect)
         screen.blit(reset_img, reset_rect)
-        if current_mode != Mode.FROZEN:
-            pixel: pg.Surface = pg.Surface(step_rect.size, flags=pg.SRCALPHA)
-            pixel.fill(game_data.grey_out_color)
-            screen.blit(pixel, step_rect, special_flags=pg.BLEND_RGB_MULT)
+        pixel: pg.Surface = pg.Surface(step_rect.size, flags=pg.SRCALPHA)
+        pixel.fill(game_data.grey_out_color)
+        if current_mode == Mode.NOSTEP:
             screen.blit(pixel, reset_rect, special_flags=pg.BLEND_RGB_MULT)
+        if current_mode != Mode.FROZEN:
+            screen.blit(pixel, step_rect, special_flags=pg.BLEND_RGB_MULT)
         
         # Tutorial prompts
         if LEVEL_NO == 1:
