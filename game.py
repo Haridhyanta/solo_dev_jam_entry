@@ -205,7 +205,7 @@ async def game() -> Scene:
 
     has_won: bool = False
 
-    TIME_BTW_STEPS_MS: int = 100
+    TIME_BTW_STEPS_MS: int = 200
     TIME_BTW_STEPS_MS_FAST_MODE: int = 10
     
     time_since_last_step_ms = 0
@@ -455,6 +455,12 @@ async def game() -> Scene:
             )
             if should_step and i==step_from_i:
                 rule.step(simulation_grid)
+
+            if current_mode != Mode.NOSTEP and i==step_from_i:
+                try: 
+                    rule.draw_arrow(screen, simulation_grid)
+                except NotImplementedError:
+                    pass
 
             if i in LEVEL_INFO.locked_options:
                 for locked_option_i in LEVEL_INFO.locked_options[i]:

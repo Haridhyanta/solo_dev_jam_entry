@@ -85,8 +85,8 @@ async def level() -> Scene:
                     if not level_rect.collidepoint(event.pos):
                         continue
 
-                    if i+1 > game_data.max_level_no:
-                        continue
+                    #if i+1 > game_data.max_level_no:
+                    #    continue
 
                     game_data.level_no = i+1
                     return Scene.GAME

@@ -2,6 +2,8 @@ import pygame as pg
 from pygame.font import Font
 
 from color import Color, enum_to_color
+from direction import Direction
+from game_data import GameData
 from grid import ColorGrid
 from helper_func import text_wrap_mono
 
@@ -139,7 +141,97 @@ class Rule:
                 option_rect
             )
 
-class NESpread(Rule):
+    def draw_arrow(self, surface: pg.surface.Surface, grid: ColorGrid) -> None:
+        raise NotImplementedError()
+
+class Spread(Rule):
+    def __init__(
+        self,
+        name_font: Font,
+        text_font: Font,
+        name_color: pg.Color,
+        text_color: pg.Color,
+        outline_color: pg.Color,
+        outline_width: int,
+        bg_rect: pg.Rect,
+        bg_color: pg.Color,
+        option_size: tuple[int, int],
+        dist_btw_option_and_text: int = 15,
+        name: str|None=None,
+        text: list[str]|None=None
+    ) -> None:
+        name = 'Spread' if name is None else name
+        text = ['The color', 'spreads to every square adjacent to it.'] if text is None else text
+        super().__init__(
+            name,
+            text,
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            dist_btw_option_and_text
+        )
+
+        self.directions: list[Direction] = [
+            Direction.RIGHT,
+            Direction.LEFT,
+            Direction.UP,
+            Direction.DOWN
+        ]
+
+    def step(self, grid: ColorGrid) -> None:
+        selected_color = self.options[0]
+        if selected_color is None:
+            return
+        new_squares: list[tuple[int, int]] = []
+        for (x, y), color in grid.get_items():
+            if color != selected_color:
+                continue
+
+            for dir in self.directions:
+                next_sq = dir.next((x, y))
+
+                if next_sq not in grid:
+                    continue
+
+                new_squares.append(next_sq)
+
+        for pos in new_squares:
+            grid[pos] = selected_color
+
+    def draw_arrow(self, surface: pg.Surface, grid: ColorGrid) -> None:
+        selected_color = self.options[0]
+        if selected_color is None:
+            return
+
+        game_data: GameData = GameData()
+
+        arrow_rect: pg.Rect = game_data.up_arrow.get_rect()
+
+        for (x, y), color in grid.get_items():
+            if color != selected_color:
+                continue
+
+            current_rect: pg.Rect = grid.get_rect((x, y))
+
+            for dir in self.directions:
+                next_sq = dir.next((x, y))
+
+                if next_sq not in grid:
+                    continue
+
+                if grid[next_sq] == selected_color:
+                    continue
+
+                dir.align_to_center(arrow_rect, current_rect)
+                surface.blit(dir.get_arrow(game_data), arrow_rect)
+
+class NESpread(Spread):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -154,27 +246,25 @@ class NESpread(Rule):
         ) -> None:
         name: str = "Up Right Spread"
         text: list[str] = ["The color", "spreads to the squares above and to the right of it."]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.UP,
+            Direction.RIGHT
+        ]
 
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        if selected_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x, y-1) in grid:
-                new_squares.append((x, y-1))
-
-            if (x+1, y) in grid:
-                new_squares.append((x+1, y))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class SESpread(Rule):
+class SESpread(Spread):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -189,27 +279,25 @@ class SESpread(Rule):
         ) -> None:
         name: str = "Down Right Spread"
         text: list[str] = ["The color", "spreads to the squares below and to the right of it."]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.DOWN,
+            Direction.RIGHT
+        ]
 
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        if selected_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x, y+1) in grid:
-                new_squares.append((x, y+1))
-
-            if (x+1, y) in grid:
-                new_squares.append((x+1, y))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class SWSpread(Rule):
+class SWSpread(Spread):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -224,27 +312,25 @@ class SWSpread(Rule):
         ) -> None:
         name: str = "Down Left Spread"
         text: list[str] = ["The color", "spreads to the squares below and to the left of it."]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.DOWN,
+            Direction.LEFT
+        ]
 
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        if selected_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x, y+1) in grid:
-                new_squares.append((x, y+1))
-
-            if (x-1, y) in grid:
-                new_squares.append((x-1, y))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class NWSpread(Rule):
+class NWSpread(Spread):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -258,28 +344,128 @@ class NWSpread(Rule):
             option_size: tuple[int, int],
         ) -> None:
         name: str = "Up Left Spread"
-        text: list[str] = ["The color", "spreads to the squares above and to the right of it."]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
+        text: list[str] = ["The color", "spreads to the squares above and to the left of it."]
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.UP,
+            Direction.LEFT
+        ]
+
+class Cover(Rule):
+    def __init__(
+        self,
+        name_font: Font,
+        text_font: Font,
+        name_color: pg.Color,
+        text_color: pg.Color,
+        outline_color: pg.Color,
+        outline_width: int,
+        bg_rect: pg.Rect,
+        bg_color: pg.Color,
+        option_size: tuple[int, int],
+        dist_btw_option_and_text: int = 15,
+        name: str|None=None,
+        text: list[str]|None=None
+    ) -> None:
+        name = 'Cover' if name is None else name
+        text = ['The color', 'spreads to every square adjacent to it unless the square is of color', ''] if text is None else text
+        super().__init__(
+            name,
+            text,
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            dist_btw_option_and_text
+        )
+
+        self.directions: list[Direction] = [
+            Direction.RIGHT,
+            Direction.LEFT,
+            Direction.UP,
+            Direction.DOWN
+        ]
 
     def step(self, grid: ColorGrid) -> None:
         selected_color = self.options[0]
         if selected_color is None:
             return
+
+        cover_color = self.options[1]
+        if cover_color is None:
+            return
+
         new_squares: list[tuple[int, int]] = []
         for (x, y), color in grid.get_items():
             if color != selected_color:
                 continue
 
-            if (x, y-1) in grid:
-                new_squares.append((x, y-1))
+            for dir in self.directions:
+                next_sq = dir.next((x, y))
 
-            if (x-1, y) in grid:
-                new_squares.append((x-1, y))
+                if next_sq not in grid:
+                    continue
 
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
+                if grid[next_sq] == cover_color:
+                    continue
 
-class NECover(Rule):
+                new_squares.append(next_sq)
+
+        for pos in new_squares:
+            grid[pos] = selected_color
+
+    def draw_arrow(self, surface: pg.Surface, grid: ColorGrid) -> None:
+        selected_color = self.options[0]
+        if selected_color is None:
+            return
+
+        cover_color = self.options[1]
+        if cover_color is None:
+            return
+
+        game_data: GameData = GameData()
+
+        arrow_rect: pg.Rect = game_data.up_arrow.get_rect()
+
+        for (x, y), color in grid.get_items():
+            if color != selected_color:
+                continue
+
+            current_rect: pg.Rect = grid.get_rect((x, y))
+
+            for dir in self.directions:
+                next_sq = dir.next((x, y))
+
+                if next_sq not in grid:
+                    continue
+
+                if grid[next_sq] == selected_color:
+                    continue
+
+                dir.align_to_center(arrow_rect, current_rect)
+                surface.blit(dir.get_arrow(game_data), arrow_rect)
+
+                if grid[next_sq] == cover_color:
+                    surface.blit(game_data.x_img, arrow_rect)
+
+class NECover(Cover):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -293,35 +479,26 @@ class NECover(Rule):
             option_size: tuple[int, int],
         ) -> None:
         name: str = "Up Right Cover"
-        text: list[str] = [
-            "The color",
-            "spreads to the squares above and to the right of it unless the squares are of color",
-            ""
+        text: list[str] = ["The color", "spreads to the squares above and to the right of it unless it is of the color", ""]
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.UP,
+            Direction.RIGHT
         ]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
 
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        cover_color = self.options[1]
-        if selected_color is None:
-            return
-        if cover_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x, y-1) in grid and grid[x, y-1] != cover_color:
-                new_squares.append((x, y-1))
-
-            if (x+1, y) in grid and grid[x+1, y] != cover_color:
-                new_squares.append((x+1, y))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class SECover(Rule):
+class SECover(Cover):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -335,35 +512,26 @@ class SECover(Rule):
             option_size: tuple[int, int],
         ) -> None:
         name: str = "Down Right Cover"
-        text: list[str] = [
-            "The color",
-            "spreads to the squares below and to the right of it unless the squares are of color",
-            ""
+        text: list[str] = ["The color", "spreads to the squares below and to the right of it unless it is of the color", ""]
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.DOWN,
+            Direction.RIGHT
         ]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
 
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        cover_color = self.options[1]
-        if selected_color is None:
-            return
-        if cover_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x, y+1) in grid and grid[x, y+1] != cover_color:
-                new_squares.append((x, y+1))
-
-            if (x+1, y) in grid and grid[x+1, y] != cover_color:
-                new_squares.append((x+1, y))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class SWCover(Rule):
+class SWCover(Cover):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -377,35 +545,26 @@ class SWCover(Rule):
             option_size: tuple[int, int],
         ) -> None:
         name: str = "Down Left Cover"
-        text: list[str] = [
-            "The color",
-            "spreads to the squares below and to the left of it unless the squares are of color",
-            ""
+        text: list[str] = ["The color", "spreads to the squares below and to the left of it unless it is of the color", ""]
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.DOWN,
+            Direction.LEFT
         ]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
 
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        cover_color = self.options[1]
-        if selected_color is None:
-            return
-        if cover_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x, y+1) in grid and grid[x, y+1] != cover_color:
-                new_squares.append((x, y+1))
-
-            if (x-1, y) in grid and grid[x-1, y] != cover_color:
-                new_squares.append((x-1, y))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class NWCover(Rule):
+class NWCover(Cover):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -419,35 +578,127 @@ class NWCover(Rule):
             option_size: tuple[int, int],
         ) -> None:
         name: str = "Up Left Cover"
-        text: list[str] = [
-            "The color",
-            "spreads to the squares above and to the left of it unless the squares are of color",
-            ""
+        text: list[str] = ["The color", "spreads to the squares above and to the left of it unless it is of the color", ""]
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.UP,
+            Direction.LEFT
         ]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
+
+class Replace(Rule):
+    def __init__(
+        self,
+        name_font: Font,
+        text_font: Font,
+        name_color: pg.Color,
+        text_color: pg.Color,
+        outline_color: pg.Color,
+        outline_width: int,
+        bg_rect: pg.Rect,
+        bg_color: pg.Color,
+        option_size: tuple[int, int],
+        dist_btw_option_and_text: int = 15,
+        name: str|None=None,
+        text: list[str]|None=None
+    ) -> None:
+        name = 'Replace' if name is None else name
+        text = ['The color', 'spreads to every square adjacent to it only if the squares of color', ''] if text is None else text
+        super().__init__(
+            name,
+            text,
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            dist_btw_option_and_text
+        )
+
+        self.directions: list[Direction] = [
+            Direction.RIGHT,
+            Direction.LEFT,
+            Direction.UP,
+            Direction.DOWN
+        ]
 
     def step(self, grid: ColorGrid) -> None:
         selected_color = self.options[0]
-        cover_color = self.options[1]
         if selected_color is None:
             return
-        if cover_color is None:
+        
+        replace_color = self.options[1]
+        if replace_color is None:
             return
+
         new_squares: list[tuple[int, int]] = []
         for (x, y), color in grid.get_items():
             if color != selected_color:
                 continue
 
-            if (x, y-1) in grid and grid[x, y-1] != cover_color:
-                new_squares.append((x, y-1))
+            for dir in self.directions:
+                next_sq = dir.next((x, y))
 
-            if (x-1, y) in grid and grid[x-1, y] != cover_color:
-                new_squares.append((x-1, y))
+                if next_sq not in grid:
+                    continue
 
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
+                if grid[next_sq] != replace_color:
+                    continue
 
-class NEReplace(Rule):
+                new_squares.append(next_sq)
+
+        for pos in new_squares:
+            grid[pos] = selected_color
+
+    def draw_arrow(self, surface: pg.Surface, grid: ColorGrid) -> None:
+        selected_color = self.options[0]
+        if selected_color is None:
+            return
+        
+        replace_color = self.options[1]
+        if replace_color is None:
+            return
+
+        game_data: GameData = GameData()
+
+        arrow_rect: pg.Rect = game_data.up_arrow.get_rect()
+        for (x, y), color in grid.get_items():
+            if color != selected_color:
+                continue
+
+            current_rect: pg.Rect = grid.get_rect((x, y))
+
+            for dir in self.directions:
+                next_sq = dir.next((x, y))
+
+                if next_sq not in grid:
+                    continue
+
+                if grid[next_sq] == selected_color:
+                    continue
+
+                dir.align_to_center(arrow_rect, current_rect)
+                surface.blit(dir.get_arrow(game_data), arrow_rect)
+
+                if grid[next_sq] != replace_color:
+                    surface.blit(game_data.x_img, arrow_rect)
+
+class NEReplace(Replace):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -466,31 +717,25 @@ class NEReplace(Rule):
             "spreads to the squares above and to the right of it if the squares are of color",
             ""
         ]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.UP,
+            Direction.RIGHT
+        ]
 
-    def step(self, grid: ColorGrid) -> None:
-        print("HERE")
-        selected_color = self.options[0]
-        cover_color = self.options[1]
-        if selected_color is None:
-            return
-        if cover_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x, y-1) in grid and grid[x, y-1] == cover_color:
-                new_squares.append((x, y-1))
-
-            if (x+1, y) in grid and grid[x+1, y] == cover_color:
-                new_squares.append((x+1, y))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class SEReplace(Rule):
+class SEReplace(Replace):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -509,30 +754,25 @@ class SEReplace(Rule):
             "spreads to the squares below and to the right of it if the squares are of color",
             ""
         ]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.DOWN,
+            Direction.RIGHT
+        ]
 
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        cover_color = self.options[1]
-        if selected_color is None:
-            return
-        if cover_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x, y+1) in grid and grid[x, y+1] == cover_color:
-                new_squares.append((x, y+1))
-
-            if (x+1, y) in grid and grid[x+1, y] == cover_color:
-                new_squares.append((x+1, y))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class SWReplace(Rule):
+class SWReplace(Replace):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -551,30 +791,25 @@ class SWReplace(Rule):
             "spreads to the squares below and to the left of it if the squares are of color",
             ""
         ]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.DOWN,
+            Direction.LEFT
+        ]
 
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        cover_color = self.options[1]
-        if selected_color is None:
-            return
-        if cover_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x, y+1) in grid and grid[x, y+1] == cover_color:
-                new_squares.append((x, y+1))
-
-            if (x-1, y) in grid and grid[x-1, y] == cover_color:
-                new_squares.append((x-1, y))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class NWReplace(Rule):
+class NWReplace(Replace):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -590,81 +825,28 @@ class NWReplace(Rule):
         name: str = "Up Left Replace"
         text: list[str] = [
             "The color",
-            "spreads to the squares above and to the left of it if the squares are of color",
+            "spreads to the squares below and to the left of it if the squares are of color",
             ""
         ]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
-
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        cover_color = self.options[1]
-        if selected_color is None:
-            return
-        if cover_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x, y-1) in grid and grid[x, y-1] == cover_color:
-                new_squares.append((x, y-1))
-
-            if (x-1, y) in grid and grid[x-1, y] == cover_color:
-                new_squares.append((x-1, y))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class Replace(Rule):
-    def __init__(
-            self,
-            name_font: pg.font.Font,
-            text_font: pg.font.Font,
-            name_color: pg.Color,
-            text_color: pg.Color,
-            outline_color: pg.Color,
-            outline_width: int,
-            bg_rect: pg.Rect,
-            bg_color: pg.Color,
-            option_size: tuple[int, int],
-        ) -> None:
-        name: str = "Replace"
-        text: list[str] = [
-            "The color",
-            "spreads to all squares around it if the squares are of color",
-            ""
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.UP,
+            Direction.LEFT
         ]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
 
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        cover_color = self.options[1]
-        if selected_color is None:
-            return
-        if cover_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x, y+1) in grid and grid[x, y+1] == cover_color:
-                new_squares.append((x, y+1))
-
-            if (x+1, y) in grid and grid[x+1, y] == cover_color:
-                new_squares.append((x+1, y))
-
-            if (x, y-1) in grid and grid[x, y-1] == cover_color:
-                new_squares.append((x, y-1))
-
-            if (x-1, y) in grid and grid[x-1, y] == cover_color:
-                new_squares.append((x-1, y))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class NMarch(Rule):
+class NMarch(Spread):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -678,25 +860,28 @@ class NMarch(Rule):
             option_size: tuple[int, int],
         ) -> None:
         name: str = "Up March"
-        text: list[str] = ["The color", "spreads to the square directly above it."]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
+        text: list[str] = [
+            "The color", 
+            "spreads to the squares directly above it."
+        ]
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.UP,
+        ]
 
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        if selected_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x, y-1) in grid:
-                new_squares.append((x, y-1))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class EMarch(Rule):
+class EMarch(Spread):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -710,25 +895,28 @@ class EMarch(Rule):
             option_size: tuple[int, int],
         ) -> None:
         name: str = "Right March"
-        text: list[str] = ["The color", "spreads to the square directly to the right of it."]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
+        text: list[str] = [
+            "The color", 
+            "spreads to the squares directly to the right of it."
+        ]
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.RIGHT,
+        ]
 
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        if selected_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x+1, y) in grid:
-                new_squares.append((x+1, y))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class SMarch(Rule):
+class SMarch(Spread):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -742,25 +930,28 @@ class SMarch(Rule):
             option_size: tuple[int, int],
         ) -> None:
         name: str = "Down March"
-        text: list[str] = ["The color", "spreads to the square directly below it."]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
+        text: list[str] = [
+            "The color", 
+            "spreads to the squares directly below it."
+        ]
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.DOWN,
+        ]
 
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        if selected_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x, y+1) in grid:
-                new_squares.append((x, y+1))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class WMarch(Rule):
+class WMarch(Spread):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -774,25 +965,28 @@ class WMarch(Rule):
             option_size: tuple[int, int],
         ) -> None:
         name: str = "Left March"
-        text: list[str] = ["The color", "spreads to the square directly to the left of it."]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
+        text: list[str] = [
+            "The color", 
+            "spreads to the squares directly to the left of it."
+        ]
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.LEFT,
+        ]
 
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        if selected_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x-1, y) in grid:
-                new_squares.append((x-1, y))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class HMarch(Rule):
+class HMarch(Spread):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -806,28 +1000,29 @@ class HMarch(Rule):
             option_size: tuple[int, int],
         ) -> None:
         name: str = "Horizontal March"
-        text: list[str] = ["The color", "spreads to the square directly to the left or right of it."]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
+        text: list[str] = [
+            "The color", 
+            "spreads horizontally"
+        ]
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.LEFT,
+            Direction.RIGHT
+        ]
 
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        if selected_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x-1, y) in grid:
-                new_squares.append((x-1, y))
-
-            if (x+1, y) in grid:
-                new_squares.append((x+1, y))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
-
-class VMarch(Rule):
+class VMarch(Spread):
     def __init__(
             self,
             name_font: pg.font.Font,
@@ -841,41 +1036,47 @@ class VMarch(Rule):
             option_size: tuple[int, int],
         ) -> None:
         name: str = "Vertical March"
-        text: list[str] = ["The color", "spreads to the square directly to the left or right of it."]
-        super().__init__(name, text, name_font, text_font, name_color, text_color, outline_color, outline_width, bg_rect, bg_color, option_size)
-
-    def step(self, grid: ColorGrid) -> None:
-        selected_color = self.options[0]
-        if selected_color is None:
-            return
-        new_squares: list[tuple[int, int]] = []
-        for (x, y), color in grid.get_items():
-            if color != selected_color:
-                continue
-
-            if (x, y-1) in grid:
-                new_squares.append((x, y-1))
-
-            if (x, y+1) in grid:
-                new_squares.append((x, y+1))
-
-        for (x, y) in new_squares:
-            grid[x, y] = selected_color
+        text: list[str] = [
+            "The color", 
+            "spreads vertically"
+        ]
+        super().__init__(
+            name_font,
+            text_font,
+            name_color,
+            text_color,
+            outline_color,
+            outline_width,
+            bg_rect,
+            bg_color,
+            option_size,
+            name=name,
+            text=text,
+        )
+        self.directions = [
+            Direction.UP,
+            Direction.DOWN
+        ]
 
 NAME_TO_RULE: dict[str, type] = {
+    "Spread": Spread,
     "N-E Spread": NESpread,
     "S-E Spread": SESpread,
     "S-W Spread": SWSpread,
     "N-W Spread": NWSpread,
+
+    "Cover": Cover,
     "N-E Cover": NECover,
     "S-E Cover": SECover,
     "S-W Cover": SWCover,
     "N-W Cover": NWCover,
+
+    "Replace": Replace,
     "N-E Replace": NEReplace,
     "S-E Replace": SEReplace,
     "S-W Replace": SWReplace,
     "N-W Replace": NWReplace,
-    "Replace": Replace,
+
     "N March": NMarch,
     "E March": EMarch,
     "S March": SMarch,
