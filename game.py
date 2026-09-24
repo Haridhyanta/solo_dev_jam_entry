@@ -95,8 +95,8 @@ async def game() -> Scene:
     current_rule_rect: pg.Rect = pg.Rect(
         0, 
         0,
-        (WIND_X * 13) // 100,
-        (WIND_Y * 17) // 30,
+        (WIND_Y * 12) // 30,
+        (WIND_Y * 12) // 30,
     )
 
     current_rule_rect.bottom = WIND_Y-DIST_BTW_RULES_AND_EDGE
@@ -124,7 +124,7 @@ async def game() -> Scene:
             2,
             rules_rects[i],
             pg.Color("White"),
-            (rules_rects[i].w * 9 // 10, rules_rects[i].h//11)
+            ((rules_rects[i].w * 28)// 100, (rules_rects[i].w * 28)// 100)
         ) for i, rule_type in enumerate(LEVEL_INFO.rules)
     ]
 

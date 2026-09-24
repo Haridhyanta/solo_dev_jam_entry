@@ -22,7 +22,7 @@ class Direction(enum.Enum):
             case Direction.DOWN:
                 return pos[0], pos[1]+move_by
 
-    def align_to_center(self, rect_to_move: Rect, fixed_rect: Rect) -> None:
+    def align_center_to_edge(self, rect_to_move: Rect, fixed_rect: Rect) -> None:
         match self:
             case Direction.RIGHT:
                 rect_to_move.center = fixed_rect.midright 
@@ -32,6 +32,17 @@ class Direction(enum.Enum):
                 rect_to_move.center = fixed_rect.midtop
             case Direction.DOWN:
                 rect_to_move.center = fixed_rect.midbottom
+
+    def align_edge_to_edge(self, rect_to_move: Rect, fixed_rect: Rect) -> None:
+        match self:
+            case Direction.RIGHT:
+                rect_to_move.midleft = fixed_rect.midright 
+            case Direction.LEFT:
+                rect_to_move.midright = fixed_rect.midleft
+            case Direction.UP:
+                rect_to_move.midbottom = fixed_rect.midtop
+            case Direction.DOWN:
+                rect_to_move.midtop = fixed_rect.midbottom
 
     def get_arrow(self, game_data: GameData) -> Surface:
         match self:

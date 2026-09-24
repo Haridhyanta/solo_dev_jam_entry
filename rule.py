@@ -6,6 +6,7 @@ from direction import Direction
 from game_data import GameData
 from grid import ColorGrid
 from helper_func import text_wrap_mono
+from multi_color_circle import get_multi_color_circle
 
 
 class Rule:
@@ -158,7 +159,8 @@ class Spread(Rule):
         option_size: tuple[int, int],
         dist_btw_option_and_text: int = 15,
         name: str|None=None,
-        text: list[str]|None=None
+        text: list[str]|None=None,
+        directions: list[Direction]|None=None,
     ) -> None:
         name = 'Spread' if name is None else name
         text = ['The color', 'spreads to every square adjacent to it.'] if text is None else text
@@ -182,7 +184,37 @@ class Spread(Rule):
             Direction.LEFT,
             Direction.UP,
             Direction.DOWN
-        ]
+        ] if directions is None else directions
+
+        body_w, body_h = bg_rect.w, bg_rect.h-self.name_sprite_rect.h - option_size[1]
+        body_rect: pg.Rect = pg.Rect(0, 0, body_w, body_h)
+        body_rect.scale_by_ip(0.95, 0.95)
+        body_rect.centerx = self.bg_rect.centerx
+        body_rect.top = self.name_sprite_rect.bottom
+
+        self.option_rects[0] = pg.Rect((0, 0), option_size)
+        self.option_rects[0].center = body_rect.center
+
+        self.circle_sprite: pg.surface.Surface = get_multi_color_circle(
+            option_size[0],
+            enum_to_color[1:-2],
+        )
+
+        self.arrow_rects: list[pg.Rect] = []
+        arrow_img_rect: pg.Rect = GameData().up_arrow.get_rect()
+
+        for direction in self.directions:
+            arrow_rect = arrow_img_rect.copy()
+            direction.align_edge_to_edge(arrow_rect, self.option_rects[0])
+            self.arrow_rects.append(arrow_rect)
+
+        self.allowed_rect: pg.Rect = self.option_rects[0].copy()
+        self.tick_img: pg.surface.Surface = pg.transform.scale_by(GameData().tick_img, 1)
+        self.tick_rect: pg.Rect = self.tick_img.get_rect()
+
+        self.allowed_rect.top = body_rect.bottom
+        self.allowed_rect.right = body_rect.centerx
+        self.tick_rect.bottomleft = self.allowed_rect.bottomright
 
     def step(self, grid: ColorGrid) -> None:
         selected_color = self.options[0]
@@ -228,8 +260,62 @@ class Spread(Rule):
                 if grid[next_sq] == selected_color:
                     continue
 
-                dir.align_to_center(arrow_rect, current_rect)
+                dir.align_center_to_edge(arrow_rect, current_rect)
                 surface.blit(dir.get_arrow(game_data), arrow_rect)
+
+    def draw(
+        self,
+        screen: pg.Surface,
+        draw_border: bool = False,
+        border_color: pg.Color = pg.Color(250, 95, 28),
+        border_w: int = 15
+    ) -> None:
+        pg.draw.rect(
+            screen,
+            self.bg_color,
+            self.bg_rect
+        )
+
+        pg.draw.rect(
+            screen,
+            self.text_color,
+            pg.Rect(*self.bg_rect.topleft, self.bg_rect.w, self.name_sprite_rect.h),
+            7,
+        )
+        screen.blit(self.name_sprite, self.name_sprite_rect)
+
+        if self.options[0] is None:
+            if draw_border:
+                pg.draw.rect(
+                    screen,
+                    border_color,
+                    self.option_rects[0].inflate(2*border_w, 2*border_w),
+                )
+
+            pg.draw.rect(
+                screen,
+                pg.Color("Black"),
+                self.option_rects[0]
+            )
+
+            sprite: pg.surface.Surface = self.text_font.render("?", True, pg.Color("White"))
+            sprite_rect: pg.Rect = sprite.get_rect()
+            sprite_rect.center = self.option_rects[0].center
+
+            # screen.blit(outline_sprite, outline_rect)
+            screen.blit(sprite, sprite_rect)
+        else: 
+            pg.draw.rect(
+                screen,
+                enum_to_color[self.options[0]],
+                self.option_rects[0]
+            )
+
+        for direction, arrow_rect in zip(self.directions, self.arrow_rects):
+            screen.blit(pg.transform.scale_by(direction.get_arrow(GameData()), 1), arrow_rect)
+
+        screen.blit(self.circle_sprite, self.allowed_rect)
+        screen.blit(self.tick_img, self.tick_rect)
 
 class NESpread(Spread):
     def __init__(
@@ -246,6 +332,10 @@ class NESpread(Spread):
         ) -> None:
         name: str = "Up Right Spread"
         text: list[str] = ["The color", "spreads to the squares above and to the right of it."]
+        directions = [
+            Direction.UP,
+            Direction.RIGHT
+        ]
         super().__init__(
             name_font,
             text_font,
@@ -258,11 +348,8 @@ class NESpread(Spread):
             option_size,
             name=name,
             text=text,
+            directions=directions,
         )
-        self.directions = [
-            Direction.UP,
-            Direction.RIGHT
-        ]
 
 class SESpread(Spread):
     def __init__(
@@ -279,6 +366,10 @@ class SESpread(Spread):
         ) -> None:
         name: str = "Down Right Spread"
         text: list[str] = ["The color", "spreads to the squares below and to the right of it."]
+        directions = [
+            Direction.DOWN,
+            Direction.RIGHT
+        ]
         super().__init__(
             name_font,
             text_font,
@@ -291,11 +382,8 @@ class SESpread(Spread):
             option_size,
             name=name,
             text=text,
+            directions=directions,
         )
-        self.directions = [
-            Direction.DOWN,
-            Direction.RIGHT
-        ]
 
 class SWSpread(Spread):
     def __init__(
@@ -312,6 +400,10 @@ class SWSpread(Spread):
         ) -> None:
         name: str = "Down Left Spread"
         text: list[str] = ["The color", "spreads to the squares below and to the left of it."]
+        directions = [
+            Direction.DOWN,
+            Direction.LEFT
+        ]
         super().__init__(
             name_font,
             text_font,
@@ -324,11 +416,8 @@ class SWSpread(Spread):
             option_size,
             name=name,
             text=text,
+            directions=directions,
         )
-        self.directions = [
-            Direction.DOWN,
-            Direction.LEFT
-        ]
 
 class NWSpread(Spread):
     def __init__(
@@ -345,6 +434,10 @@ class NWSpread(Spread):
         ) -> None:
         name: str = "Up Left Spread"
         text: list[str] = ["The color", "spreads to the squares above and to the left of it."]
+        directions = [
+            Direction.UP,
+            Direction.LEFT
+        ]
         super().__init__(
             name_font,
             text_font,
@@ -357,11 +450,8 @@ class NWSpread(Spread):
             option_size,
             name=name,
             text=text,
+            directions=directions,
         )
-        self.directions = [
-            Direction.UP,
-            Direction.LEFT
-        ]
 
 class Cover(Rule):
     def __init__(
@@ -459,7 +549,7 @@ class Cover(Rule):
                 if grid[next_sq] == selected_color:
                     continue
 
-                dir.align_to_center(arrow_rect, current_rect)
+                dir.align_center_to_edge(arrow_rect, current_rect)
                 surface.blit(dir.get_arrow(game_data), arrow_rect)
 
                 if grid[next_sq] == cover_color:
@@ -692,7 +782,7 @@ class Replace(Rule):
                 if grid[next_sq] == selected_color:
                     continue
 
-                dir.align_to_center(arrow_rect, current_rect)
+                dir.align_center_to_edge(arrow_rect, current_rect)
                 surface.blit(dir.get_arrow(game_data), arrow_rect)
 
                 if grid[next_sq] != replace_color:
@@ -864,6 +954,9 @@ class NMarch(Spread):
             "The color", 
             "spreads to the squares directly above it."
         ]
+        directions = [
+            Direction.UP,
+        ]
         super().__init__(
             name_font,
             text_font,
@@ -876,10 +969,8 @@ class NMarch(Spread):
             option_size,
             name=name,
             text=text,
+            directions=directions,
         )
-        self.directions = [
-            Direction.UP,
-        ]
 
 class EMarch(Spread):
     def __init__(
@@ -899,6 +990,9 @@ class EMarch(Spread):
             "The color", 
             "spreads to the squares directly to the right of it."
         ]
+        directions = [
+            Direction.RIGHT,
+        ]
         super().__init__(
             name_font,
             text_font,
@@ -911,10 +1005,8 @@ class EMarch(Spread):
             option_size,
             name=name,
             text=text,
+            directions=directions,
         )
-        self.directions = [
-            Direction.RIGHT,
-        ]
 
 class SMarch(Spread):
     def __init__(
@@ -934,6 +1026,9 @@ class SMarch(Spread):
             "The color", 
             "spreads to the squares directly below it."
         ]
+        directions = [
+            Direction.DOWN,
+        ]
         super().__init__(
             name_font,
             text_font,
@@ -946,10 +1041,8 @@ class SMarch(Spread):
             option_size,
             name=name,
             text=text,
+            directions=directions,
         )
-        self.directions = [
-            Direction.DOWN,
-        ]
 
 class WMarch(Spread):
     def __init__(
@@ -969,6 +1062,9 @@ class WMarch(Spread):
             "The color", 
             "spreads to the squares directly to the left of it."
         ]
+        directions = [
+            Direction.LEFT,
+        ]
         super().__init__(
             name_font,
             text_font,
@@ -981,10 +1077,8 @@ class WMarch(Spread):
             option_size,
             name=name,
             text=text,
+            directions=directions,
         )
-        self.directions = [
-            Direction.LEFT,
-        ]
 
 class HMarch(Spread):
     def __init__(
@@ -1004,6 +1098,10 @@ class HMarch(Spread):
             "The color", 
             "spreads horizontally"
         ]
+        directions = [
+            Direction.LEFT,
+            Direction.RIGHT
+        ]
         super().__init__(
             name_font,
             text_font,
@@ -1016,11 +1114,8 @@ class HMarch(Spread):
             option_size,
             name=name,
             text=text,
+            directions=directions,
         )
-        self.directions = [
-            Direction.LEFT,
-            Direction.RIGHT
-        ]
 
 class VMarch(Spread):
     def __init__(
@@ -1040,6 +1135,10 @@ class VMarch(Spread):
             "The color", 
             "spreads vertically"
         ]
+        directions = [
+            Direction.UP,
+            Direction.DOWN
+        ]
         super().__init__(
             name_font,
             text_font,
@@ -1052,11 +1151,8 @@ class VMarch(Spread):
             option_size,
             name=name,
             text=text,
+            directions=directions,
         )
-        self.directions = [
-            Direction.UP,
-            Direction.DOWN
-        ]
 
 NAME_TO_RULE: dict[str, type] = {
     "Spread": Spread,
